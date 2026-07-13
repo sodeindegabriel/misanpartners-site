@@ -199,8 +199,10 @@
       }
 
       function loadInvestors(){
+        console.log('loadInvestors called');
         return fetch('/api/admin/investors', { credentials: 'include', cache: 'no-store' })
           .then(function(res){
+            console.log('loadInvestors response status:', res.status);
             if (res.status === 401){
               showGate();
               return;
@@ -210,10 +212,16 @@
               return;
             }
             return res.json().then(function(investors){
+              if (!Array.isArray(investors)){
+                console.log('loadInvestors: unexpected response body', investors);
+                investorsHost.innerHTML = '<div class="empty-state">Could not load investors.</div>';
+                return;
+              }
               renderInvestors(investors);
             });
           })
-          .catch(function(){
+          .catch(function(err){
+            console.log('loadInvestors error:', err);
             investorsHost.innerHTML = '<div class="empty-state">Could not load investors.</div>';
           });
       }
