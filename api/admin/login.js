@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
+  console.log('[admin-login] setting misan_admin cookie');
   res.setHeader('Set-Cookie', buildCookie('misan_admin', process.env.ADMIN_PASSWORD, 86400));
   return res.status(200).json({ success: true });
 };

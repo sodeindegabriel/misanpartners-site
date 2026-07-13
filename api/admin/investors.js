@@ -16,6 +16,10 @@ function parseCookies(header) {
 }
 
 module.exports = async (req, res) => {
+  const cookieHeader = req.headers.cookie || '';
+  console.log('[admin-investors] cookie header:', cookieHeader ? 'present' : 'missing');
+  console.log('[admin-investors] cookies:', cookieHeader.split(';').map(c => c.trim().split('=')[0]));
+
   const cookies = parseCookies(req.headers.cookie);
 
   if (!cookies.misan_admin || cookies.misan_admin !== process.env.ADMIN_PASSWORD) {
