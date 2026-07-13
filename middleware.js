@@ -2,8 +2,6 @@ export const config = {
   matcher: [
     '/investors/portal/:path*',
     '/investors/data/:file(.*\\.json)',
-    '/api/admin/requests',
-    '/api/admin/approve',
   ],
 };
 
@@ -22,21 +20,6 @@ function parseCookies(header) {
 
 export default async function middleware(request) {
   const cookies = parseCookies(request.headers.get('cookie'));
-  const { pathname } = new URL(request.url);
-
-  if (pathname.startsWith('/api/admin/')) {
-    const adminToken = cookies.misan_admin;
-
-    if (!adminToken || adminToken !== process.env.ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    return;
-  }
-
   const token = cookies.misan_session;
 
   if (!token) {
