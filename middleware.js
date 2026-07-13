@@ -20,10 +20,7 @@ export default async function middleware(request) {
   const token = cookies.misan_session;
 
   if (!token) {
-    return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return Response.redirect(new URL('/investors/', request.url), 302);
   }
 
   const response = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
@@ -34,9 +31,6 @@ export default async function middleware(request) {
   });
 
   if (!response.ok) {
-    return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return Response.redirect(new URL('/investors/', request.url), 302);
   }
 }
