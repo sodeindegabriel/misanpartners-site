@@ -126,7 +126,7 @@
       btn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        handleDownload(btn.dataset.fileId, btn.dataset.tier);
+        handleDownload(btn.dataset.fileId, btn.dataset.tier, btn);
       });
     });
     listEl.querySelectorAll('.dr-request-btn').forEach(btn => {
@@ -175,22 +175,19 @@
     }
   }
 
-  async function handleDownload(fileId, tier){
-    const url = '/api/drive/download?fileId=' + encodeURIComponent(fileId) + '&tier=' + encodeURIComponent(tier);
+  async function handleDownload(fileId, tier, btn) {
+    if (tier !== 'open') return;
+    const url = `/api/drive/download?fileId=${encodeURIComponent(fileId)}&tier=${encodeURIComponent(tier)}`;
     try {
-      const res = await fetch(url, { redirect: 'manual', credentials: 'include' });
-      if (res.status === 401){
-        window.location.href = '/investors/';
-        return;
-      }
-      if (res.type === 'opaqueredirect'){
-        window.location.href = url;
-        return;
-      }
-      const data = await res.json().catch(() => ({}));
-      alert(data.error || 'Download failed.');
-    } catch(e){
-      alert('Download failed.');
+      btn.textContent = 'Opening…';
+      btn.style.pointerEvents = 'none';
+      // Open in new tab — browser handles Content-Disposition: attachment natively
+      window.open(url, '_blank');
+    } catch (err) {
+      alert('Download failed. Please try again.');
+    } finally {
+      btn.textContent = 'OPEN ↓';
+      btn.style.pointerEvents = '';
     }
   }
 
