@@ -40,16 +40,39 @@
     </div>
   </main>
   <script>
-    /* INTERIM behaviour until the portal backend exists.
-       Remove this block once the form is wired to real authentication. */
     (function () {
       var f = document.getElementById('gateForm');
       var m = document.getElementById('gateMsg');
+      var btn = f ? f.querySelector('.enter') : null;
       if (!f) return;
       f.addEventListener('submit', function (e) {
         e.preventDefault();
-        m.innerHTML = 'Access is by invitation. To request access, email ' +
-          '<a href="mailto:c@misanpartners.com">c@misanpartners.com</a>.';
+        var email = f.email.value;
+        var password = f.password.value;
+        var originalLabel = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Checking...';
+        m.textContent = '';
+
+        fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password }),
+        })
+          .then(function (res) {
+            if (res.ok) {
+              window.location.href = '/investors/portal/';
+              return;
+            }
+            btn.disabled = false;
+            btn.textContent = originalLabel;
+            m.textContent = 'Access denied. Please check your credentials.';
+          })
+          .catch(function () {
+            btn.disabled = false;
+            btn.textContent = originalLabel;
+            m.textContent = 'Access denied. Please check your credentials.';
+          });
       });
     })();
   </script>
