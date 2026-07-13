@@ -1,3 +1,4 @@
+const { Readable } = require('stream');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -69,8 +70,32 @@ module.exports = async (req, res) => {
     return res.status(502).json({ error: 'Failed to authenticate with Google Drive' });
   }
 
-  const signedUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&access_token=${accessToken}`;
+  const metaRes = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=webContentLink,mimeType,name`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
 
-  res.writeHead(302, { Location: signedUrl });
-  return res.end();
+  if (!metaRes.ok) {
+    return res.status(502).json({ error: 'Failed to load file metadata' });
+  }
+
+  const meta = await metaRes.json();
+  const isGoogleWorkspaceFile = (meta.mimeType || '').startsWith('application/vnd.google-apps');
+
+  const fileRes = await fetch(
+    isGoogleWorkspaceFile
+      ? `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`
+      : `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  if (!fileRes.ok || !fileRes.body) {
+    return res.status(502).json({ error: 'Failed to download file' });
+  }
+
+  const filename = isGoogleWorkspaceFile ? `${meta.name}.pdf` : meta.name;
+
+  res.setHeader('Content-Type', isGoogleWorkspaceFile ? 'application/pdf' : meta.mimeType);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  Readable.fromWeb(fileRes.body).pipe(res);
 };
