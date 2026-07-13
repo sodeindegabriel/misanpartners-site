@@ -25,13 +25,7 @@ module.exports = async (req, res) => {
     return res.status(502).send('Failed to exchange authorization code');
   }
 
-  console.log('[google-oauth] full token response:', JSON.stringify({
-    has_access_token: !!tokenData.access_token,
-    has_refresh_token: !!tokenData.refresh_token,
-    scope: tokenData.scope,
-    token_type: tokenData.token_type,
-    refresh_token_preview: tokenData.refresh_token?.slice(0, 20)
-  }));
+  console.log('[google-oauth] REFRESH_TOKEN_FULL:', tokenData.refresh_token);
 
   return res.status(200).send('Google Drive authorized. Check server logs for the refresh token.');
 };
