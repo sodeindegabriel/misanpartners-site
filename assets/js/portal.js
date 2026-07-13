@@ -72,36 +72,29 @@
 
   // ---------------------- data load ----------------------
 
-  async function fetchJSON(depth, id) {
+  async function fetchJSON(id) {
     const url = `/investors/data/${id}.json`;
-    console.log('[fetchJSON] fetching:', url);
     try {
       const r = await fetch(url, { credentials: 'include' });
-      console.log('[fetchJSON] response status:', r.status, 'redirected:', r.redirected, 'content-type:', r.headers.get('content-type'), 'url:', r.url);
       const contentType = r.headers.get('content-type') || '';
       if (r.status === 401 || (r.redirected && !contentType.includes('application/json'))) {
-        console.log('[fetchJSON] redirected to login, going to /investors/');
         window.location.href = '/investors/';
         return null;
       }
       if (!r.ok) {
-        console.log('[fetchJSON] not ok:', r.status);
         return null;
       }
-      const data = await r.json();
-      console.log('[fetchJSON] success, got data:', Object.keys(data));
-      return data;
+      return await r.json();
     } catch (err) {
-      console.log('[fetchJSON] error:', err.message);
       return null;
     }
   }
 
-  async function loadProjects(depth){
+  async function loadProjects(){
     const list = ['axd', 'galatians'];
     const out = [];
     for (const id of list){
-      try { out.push(await fetchJSON(depth, id)); }
+      try { out.push(await fetchJSON(id)); }
       catch(e){ console.error('Project load failed:', id, e); }
     }
     return out;
@@ -456,8 +449,7 @@
   window.PortalApp = {
     initHome: async function(){
       try {
-        // home is at /investors/portal/index.html → ../data
-        const projects = await loadProjects(1);
+        const projects = await loadProjects();
         renderHome(projects);
       } catch(e){
         console.error(e);
@@ -466,8 +458,7 @@
     },
     initProject: async function(id){
       try {
-        // project page at /investors/portal/<id>/index.html → ../../data
-        const p = await fetchJSON(2, id);
+        const p = await fetchJSON(id);
         document.title = p.name + ' — Misan Partners';
         renderProject(p);
       } catch(e){
