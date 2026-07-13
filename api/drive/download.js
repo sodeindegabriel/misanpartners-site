@@ -80,6 +80,13 @@ module.exports = async (req, res) => {
   }
 
   const meta = await metaRes.json();
+
+  if (meta.mimeType && meta.mimeType.startsWith('video/')) {
+    const viewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    res.writeHead(302, { Location: viewUrl });
+    return res.end();
+  }
+
   const isGoogleWorkspaceFile = (meta.mimeType || '').startsWith('application/vnd.google-apps');
 
   const fileRes = await fetch(

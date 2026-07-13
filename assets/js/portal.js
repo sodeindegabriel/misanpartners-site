@@ -114,9 +114,10 @@
       </div><div class="dr-sublist" style="display:none;margin-left:4px;padding-left:14px;border-left:1px solid rgba(255,255,255,.07)"></div>`;
     }
 
+    const isVideo = (file.mimeType || '').startsWith('video/');
     const action = tier === 'locked'
       ? `<a href="#" class="lock-l dr-request-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">Request</a>`
-      : `<a href="#" class="open-l dr-download-btn" data-file-id="${escapeHTML(file.id)}" data-tier="${escapeHTML(tier)}">Open ↓</a>`;
+      : `<a href="#" class="open-l dr-download-btn" data-file-id="${escapeHTML(file.id)}" data-tier="${escapeHTML(tier)}">${isVideo ? 'PLAY ▶' : 'Open ↓'}</a>`;
     return `<div class="dr-row">
       <span class="n">${escapeHTML(file.name)}</span>
       <span class="meta">${escapeHTML(type)}</span>
@@ -237,6 +238,7 @@
   async function handleDownload(fileId, tier, btn) {
     if (tier !== 'open') return;
     const url = `/api/drive/download?fileId=${encodeURIComponent(fileId)}&tier=${encodeURIComponent(tier)}`;
+    const original = btn.textContent;
     try {
       btn.textContent = 'Opening…';
       btn.style.pointerEvents = 'none';
@@ -245,7 +247,7 @@
     } catch (err) {
       alert('Download failed. Please try again.');
     } finally {
-      btn.textContent = 'OPEN ↓';
+      btn.textContent = original;
       btn.style.pointerEvents = '';
     }
   }
