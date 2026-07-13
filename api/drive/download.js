@@ -55,12 +55,29 @@ module.exports = async (req, res) => {
 
   const { fileId, tier } = req.query;
 
-  if (tier !== 'open') {
-    return res.status(403).json({ error: 'Access requires approval' });
-  }
-
   if (!fileId) {
     return res.status(400).json({ error: 'Missing fileId' });
+  }
+
+  // `tier` from the client is only a hint for already-open files. For anything else,
+  // access must be independently confirmed against access_requests — never trust the
+  // client-supplied tier to decide whether a locked file gets served.
+  if (tier !== 'open') {
+    const { data: accessRows, error: accessError } = await supabase
+      .from('access_requests')
+      .select('status')
+      .eq('investor_email', userData.user.email)
+      .eq('file_id', fileId)
+      .eq('status', 'approved')
+      .limit(1);
+
+    if (accessError) {
+      return res.status(500).json({ error: 'Failed to verify access' });
+    }
+
+    if (!accessRows || accessRows.length === 0) {
+      return res.status(403).json({ error: 'Access requires approval' });
+    }
   }
 
   let accessToken;
