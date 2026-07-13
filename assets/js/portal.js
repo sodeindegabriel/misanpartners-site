@@ -72,11 +72,9 @@
 
   // ---------------------- data load ----------------------
 
-  // depth: how many '../' levels back to /investors/data/ from current page
   async function fetchJSON(depth, id) {
-    const prefix = depth === 1 ? '../' : '../../';
-    const url = `${prefix}data/${id}.json`;
-    console.log('[fetchJSON] fetching:', url, 'full path:', window.location.origin + '/investors/data/' + id + '.json');
+    const url = `/investors/data/${id}.json`;
+    console.log('[fetchJSON] fetching:', url);
     try {
       const r = await fetch(url, { credentials: 'include' });
       console.log('[fetchJSON] response status:', r.status, 'redirected:', r.redirected, 'content-type:', r.headers.get('content-type'), 'url:', r.url);
