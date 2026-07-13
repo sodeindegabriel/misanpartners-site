@@ -16,6 +16,39 @@
     return '$' + n;
   };
   const tierLabel = t => t === 'open' ? 'Open' : t === 'locked' ? 'Locked · admin approval' : 'Mixed · open + locked';
+  const escapeHTML = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
+  ));
+
+  function extractFolderId(driveUrl){
+    if (!driveUrl) return null;
+    const m = driveUrl.match(/\/folders\/([^/?#]+)/);
+    return m ? m[1] : null;
+  }
+
+  const MIME_TYPE_LABELS = {
+    'application/pdf': 'PDF',
+    'application/vnd.google-apps.document': 'Doc',
+    'application/vnd.google-apps.spreadsheet': 'Sheet',
+    'application/vnd.google-apps.presentation': 'Slides',
+    'application/vnd.google-apps.folder': 'Folder',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Doc',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Slides',
+    'application/msword': 'Doc',
+    'application/vnd.ms-excel': 'Sheet',
+    'application/zip': 'Zip',
+    'text/csv': 'CSV',
+    'text/plain': 'Text'
+  };
+
+  function mimeToType(mimeType){
+    if (!mimeType) return 'File';
+    if (MIME_TYPE_LABELS[mimeType]) return MIME_TYPE_LABELS[mimeType];
+    if (mimeType.indexOf('image/') === 0) return mimeType.split('/')[1].toUpperCase();
+    const last = mimeType.split('/').pop().split('.').pop();
+    return last ? last.toUpperCase() : 'File';
+  }
 
   // MISAN wordmark SVG (re-used in topbar)
   function markSVG(){
@@ -55,6 +88,135 @@
       catch(e){ console.error('Project load failed:', id, e); }
     }
     return out;
+  }
+
+  // ---------------------- data room (live Google Drive) ----------------------
+
+  function fileRowHTML(file, tier){
+    const type = mimeToType(file.mimeType);
+    const action = tier === 'locked'
+      ? `<a href="#" class="lock-l dr-request-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">Request</a>`
+      : `<a href="#" class="open-l dr-download-btn" data-file-id="${escapeHTML(file.id)}" data-tier="${escapeHTML(tier)}">Open ↓</a>`;
+    return `<div class="dr-row">
+      <span class="n">${escapeHTML(file.name)}</span>
+      <span class="meta">${escapeHTML(type)}</span>
+      ${action}
+    </div>`;
+  }
+
+  function renderFolderFiles(folderEl, files, tier){
+    const listEl = folderEl.querySelector('.dr-list');
+    const countEl = folderEl.querySelector('.count');
+    if (countEl) countEl.textContent = files.length + ' ' + (files.length === 1 ? 'document' : 'documents');
+    listEl.innerHTML = files.length
+      ? files.map(f => fileRowHTML(f, tier)).join('')
+      : '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">No files in this folder.</span></div>';
+
+    listEl.querySelectorAll('.dr-download-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleDownload(btn.dataset.fileId, btn.dataset.tier);
+      });
+    });
+    listEl.querySelectorAll('.dr-request-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleRequestAccess(btn, btn.dataset.fileId, btn.dataset.fileName);
+      });
+    });
+  }
+
+  function showFolderError(folderEl, message){
+    const listEl = folderEl.querySelector('.dr-list');
+    const countEl = folderEl.querySelector('.count');
+    if (countEl) countEl.textContent = '—';
+    listEl.innerHTML = '<div class="dr-row"><span class="n" style="color:rgba(251,191,36,.85)">' + escapeHTML(message) + '</span></div>';
+  }
+
+  async function loadFolderFiles(folderEl, folder, projectName){
+    const listEl = folderEl.querySelector('.dr-list');
+    const folderId = extractFolderId(folder.drive_url);
+
+    if (!folderId){
+      const countEl = folderEl.querySelector('.count');
+      if (countEl) countEl.textContent = '0 documents';
+      listEl.innerHTML = '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">No files available.</span></div>';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/drive/files?folderId=' + encodeURIComponent(folderId));
+      if (res.status === 401){
+        window.location.href = '/investors/';
+        return;
+      }
+      if (!res.ok){
+        showFolderError(folderEl, 'Could not load files.');
+        return;
+      }
+      const files = await res.json();
+      folderEl.dataset.projectName = projectName;
+      renderFolderFiles(folderEl, files, folder.tier);
+    } catch(e){
+      console.error('Drive file list failed:', folder.id, e);
+      showFolderError(folderEl, 'Could not load files.');
+    }
+  }
+
+  async function handleDownload(fileId, tier){
+    const url = '/api/drive/download?fileId=' + encodeURIComponent(fileId) + '&tier=' + encodeURIComponent(tier);
+    try {
+      const res = await fetch(url, { redirect: 'manual' });
+      if (res.status === 401){
+        window.location.href = '/investors/';
+        return;
+      }
+      if (res.type === 'opaqueredirect'){
+        window.location.href = url;
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Download failed.');
+    } catch(e){
+      alert('Download failed.');
+    }
+  }
+
+  async function handleRequestAccess(btn, fileId, fileName){
+    if (btn.dataset.busy || btn.dataset.done) return;
+    btn.dataset.busy = 'true';
+
+    const folderEl = btn.closest('.dr-folder');
+    const projectName = (folderEl && folderEl.dataset.projectName) || '';
+    const original = btn.textContent;
+    btn.textContent = 'Requesting...';
+
+    try {
+      const res = await fetch('/api/drive/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileId, fileName, projectName })
+      });
+      if (res.status === 401){
+        window.location.href = '/investors/';
+        return;
+      }
+      if (!res.ok){
+        btn.textContent = original;
+        delete btn.dataset.busy;
+        alert('Request failed. Please try again.');
+        return;
+      }
+      btn.textContent = 'Requested ✓';
+      btn.dataset.done = 'true';
+      delete btn.dataset.busy;
+    } catch(e){
+      btn.textContent = original;
+      delete btn.dataset.busy;
+      alert('Request failed. Please try again.');
+    }
   }
 
   // ---------------------- portal home ----------------------
@@ -199,21 +361,17 @@
       </div>` : '';
 
     // data room
-    const folders = ((p.data_room && p.data_room.folders) || []).map(f => {
-      const docs = (f.documents || []).map(d => `
-        <div class="dr-row">
-          <span class="n">${d.title}</span>
-          <span class="meta">${d.type} · ${d.date}</span>
-          <span class="${f.tier==='locked'?'lock-l':'open-l'}">${f.tier==='locked'?'Request':'Open ↓'}</span>
-        </div>`).join('');
-      const count = f.documents ? f.documents.length : 0;
+    const drFolders = (p.data_room && p.data_room.folders) || [];
+    const folders = drFolders.map(f => {
+      const hasDrive = !!f.drive_url;
+      const loadingRow = '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">Loading files…</span></div>';
       return `<div class="dr-folder ${f.tier}" data-folder="${f.id}">
         <div class="num">${f.number}</div>
         <div class="title">${f.title}</div>
         <div class="tier">${tierLabel(f.tier)}</div>
-        <div class="count">${count} ${count===1?'document':'documents'}</div>
+        <div class="count">${hasDrive ? 'Loading…' : '0 documents'}</div>
         <div class="action">${f.tier==='locked' ? 'Request →' : 'Open ↓'}</div>
-        ${docs ? `<div class="dr-list">${docs}</div>` : ''}
+        <div class="dr-list">${hasDrive ? loadingRow : ''}</div>
       </div>`;
     }).join('');
 
@@ -264,6 +422,14 @@
         e.preventDefault();
         f.classList.toggle('expanded');
       });
+    });
+
+    // live Google Drive file listing per folder
+    document.querySelectorAll('.dr-folder').forEach((folderEl, i) => {
+      const folder = drFolders[i];
+      if (folder && folder.drive_url) {
+        loadFolderFiles(folderEl, folder, p.name);
+      }
     });
   }
 
