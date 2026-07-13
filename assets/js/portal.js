@@ -157,13 +157,13 @@
         btn.style.color = 'rgba(255,255,255,.35)';
         btn.style.pointerEvents = 'none';
       } else if (status === 'declined'){
-        btn.textContent = 'Access Declined';
         btn.dataset.done = 'true';
         btn.style.color = 'rgba(255,255,255,0.35)';
         btn.style.fontSize = '0.7rem';
         btn.style.letterSpacing = '0.08em';
         btn.style.textTransform = 'uppercase';
         btn.style.pointerEvents = 'none';
+        btn.innerHTML = 'Access Declined · <a href="mailto:c@misanpartners.com" style="color:rgba(255,255,255,0.5);text-decoration:underline;pointer-events:auto;">contact us</a>';
       }
       // status === 'none' — leave the button as the default "REQUEST →"
     } catch(e){
