@@ -4,7 +4,7 @@
 ID: axd
 Subsidiary: Misan Spaces
 Name: Arena X District
-Tagline: West Africa's first 15,000-seat arena, in a 9.25 ha mixed-use district. Alaro City, Lagos, Nigeria.
+Tagline: West Africa's first 15,000-seat arena, in a 9.25 ha mixed-use district. Alaro City, Lagos.
 Stage: Pre-Development
 
 ## Raise
