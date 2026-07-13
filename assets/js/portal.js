@@ -104,6 +104,16 @@
 
   function fileRowHTML(file, tier){
     const type = mimeToType(file.mimeType);
+    const isFolder = file.mimeType === 'application/vnd.google-apps.folder';
+
+    if (isFolder){
+      return `<div class="dr-row">
+        <span class="n">${escapeHTML(file.name)}</span>
+        <span class="meta">${escapeHTML(type)}</span>
+        <a href="#" class="open-l dr-folder-open-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">VIEW →</a>
+      </div><div class="dr-sublist" style="display:none;margin-left:4px;padding-left:14px;border-left:1px solid rgba(255,255,255,.07)"></div>`;
+    }
+
     const action = tier === 'locked'
       ? `<a href="#" class="lock-l dr-request-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">Request</a>`
       : `<a href="#" class="open-l dr-download-btn" data-file-id="${escapeHTML(file.id)}" data-tier="${escapeHTML(tier)}">Open ↓</a>`;
@@ -114,28 +124,39 @@
     </div>`;
   }
 
-  function renderFolderFiles(folderEl, files, tier){
-    const listEl = folderEl.querySelector('.dr-list');
-    const countEl = folderEl.querySelector('.count');
-    if (countEl) countEl.textContent = files.length + ' ' + (files.length === 1 ? 'document' : 'documents');
-    listEl.innerHTML = files.length
-      ? files.map(f => fileRowHTML(f, tier)).join('')
-      : '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">No files in this folder.</span></div>';
-
-    listEl.querySelectorAll('.dr-download-btn').forEach(btn => {
+  function bindRowActions(containerEl){
+    containerEl.querySelectorAll('.dr-download-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
         handleDownload(btn.dataset.fileId, btn.dataset.tier, btn);
       });
     });
-    listEl.querySelectorAll('.dr-request-btn').forEach(btn => {
+    containerEl.querySelectorAll('.dr-request-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
         handleRequestAccess(btn, btn.dataset.fileId, btn.dataset.fileName);
       });
     });
+    containerEl.querySelectorAll('.dr-folder-open-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleFolderOpen(btn.dataset.fileId, btn.dataset.fileName, btn);
+      });
+    });
+  }
+
+  function renderFolderFiles(folderEl, files, tier){
+    const listEl = folderEl.querySelector('.dr-list');
+    const countEl = folderEl.querySelector('.count');
+    folderEl.dataset.tier = tier;
+    if (countEl) countEl.textContent = files.length + ' ' + (files.length === 1 ? 'document' : 'documents');
+    listEl.innerHTML = files.length
+      ? files.map(f => fileRowHTML(f, tier)).join('')
+      : '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">No files in this folder.</span></div>';
+    bindRowActions(listEl);
   }
 
   function showFolderError(folderEl, message){
@@ -172,6 +193,44 @@
     } catch(e){
       console.error('Drive file list failed:', folder.id, e);
       showFolderError(folderEl, 'Could not load files.');
+    }
+  }
+
+  async function handleFolderOpen(fileId, fileName, btn){
+    const rowEl = btn.closest('.dr-row');
+    const sublistEl = rowEl.nextElementSibling;
+    if (!sublistEl) return;
+
+    if (sublistEl.dataset.loaded === 'true'){
+      sublistEl.style.display = sublistEl.style.display === 'none' ? 'block' : 'none';
+      return;
+    }
+
+    const folderEl = btn.closest('.dr-folder');
+    const tier = (folderEl && folderEl.dataset.tier) || 'open';
+
+    sublistEl.style.display = 'block';
+    sublistEl.innerHTML = '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">Loading…</span></div>';
+
+    try {
+      const res = await fetch('/api/drive/files?folderId=' + encodeURIComponent(fileId), { credentials: 'include' });
+      if (res.status === 401){
+        window.location.href = '/investors/';
+        return;
+      }
+      if (!res.ok){
+        sublistEl.innerHTML = '<div class="dr-row"><span class="n" style="color:rgba(251,191,36,.85)">Could not load files.</span></div>';
+        return;
+      }
+      const files = await res.json();
+      sublistEl.innerHTML = files.length
+        ? files.map(f => fileRowHTML(f, tier)).join('')
+        : '<div class="dr-row"><span class="n" style="color:rgba(255,255,255,.4)">No files in this folder.</span></div>';
+      bindRowActions(sublistEl);
+      sublistEl.dataset.loaded = 'true';
+    } catch(e){
+      console.error('Subfolder load failed:', fileId, e);
+      sublistEl.innerHTML = '<div class="dr-row"><span class="n" style="color:rgba(251,191,36,.85)">Could not load files.</span></div>';
     }
   }
 
