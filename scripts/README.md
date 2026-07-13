@@ -124,3 +124,15 @@ want to clear it out.
 Since most folders are already wired to a live Google Drive folder (`drive_url` set), this
 section usually only matters for folders that don't have one yet — the portal fetches live
 file listings from Drive directly for anything that does.
+
+# Investor invites
+
+The admin panel (`/admin/`) has an "Investors" section for inviting and revoking investor
+accounts, backed by `api/admin/invite.js`, `api/admin/investors.js`, and
+`api/admin/revoke.js`. Sending an invite calls Supabase's
+`auth.admin.inviteUserByEmail()`, which sends the investor an email (from Supabase, not
+this app) containing a magic link to set their own password.
+
+**Chin should customize this email** in the Supabase dashboard under
+**Authentication → Email Templates → Invite User** — by default it's Supabase's generic
+template and doesn't mention Misan Partners at all.

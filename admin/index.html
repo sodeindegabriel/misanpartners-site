@@ -48,7 +48,29 @@
       padding:11px 14px;color:#fff;font-family:inherit;font-size:13px;cursor:pointer}
     .admin-select:focus{outline:none;border-color:rgba(255,255,255,.55)}
     .admin-count{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--w40);white-space:nowrap}
-    @media (max-width:720px){.requests-table{min-width:640px}}
+    .invite-form{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+    .invite-form input{flex:1;min-width:220px;background:#000;border:1px solid rgba(255,255,255,.2);border-radius:10px;
+      padding:11px 14px;color:#fff;font-family:inherit;font-size:13px}
+    .invite-form input::placeholder{color:rgba(255,255,255,.3)}
+    .invite-form input:focus{outline:none;border-color:rgba(255,255,255,.55)}
+    .invite-btn{font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+      padding:0 20px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#fff;color:#000;
+      cursor:pointer;transition:background .2s;white-space:nowrap}
+    .invite-btn:hover{background:rgba(255,255,255,.85)}
+    .invite-btn:disabled{opacity:.5;cursor:default}
+    .invite-msg{font-size:12px;color:var(--w55);margin-bottom:28px;min-height:1.2em}
+    .investors-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--w10);
+      border-radius:14px;overflow:hidden;font-size:13px;margin-bottom:48px}
+    .investors-table th{text-align:left;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--w40);font-weight:400;padding:14px 16px;border-bottom:1px solid var(--w10)}
+    .investors-table td{padding:14px 16px;border-bottom:1px solid var(--w10);color:rgba(255,255,255,.85);vertical-align:middle}
+    .investors-table tr:last-child td{border-bottom:0}
+    .revoke-investor-btn{font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+      padding:7px 12px;border-radius:8px;border:1px solid var(--w10);background:transparent;color:#fff;
+      cursor:pointer;transition:background .2s}
+    .revoke-investor-btn:hover{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.4)}
+    .revoke-investor-btn:disabled{opacity:.5;cursor:default}
+    @media (max-width:720px){.requests-table{min-width:640px}.investors-table{min-width:520px}}
   </style>
 </head>
 <body>
@@ -71,6 +93,16 @@
 
   <main id="adminView" style="display:none">
     <div class="admin-wrap">
+      <div class="admin-head">
+        <h1>Investors</h1>
+      </div>
+      <form id="inviteForm" class="invite-form">
+        <input type="email" id="inviteEmail" required placeholder="investor@email.com" autocomplete="off">
+        <button type="submit" class="invite-btn">Send Invite</button>
+      </form>
+      <p class="invite-msg" id="inviteMsg"></p>
+      <div class="table-scroll" id="investorsHost"></div>
+
       <div class="admin-head">
         <h1>Access requests</h1>
         <div class="admin-refresh">Auto-refreshing · every 60s</div>
@@ -102,6 +134,10 @@
       var searchInput = document.getElementById('searchInput');
       var statusFilter = document.getElementById('statusFilter');
       var resultsCount = document.getElementById('resultsCount');
+      var investorsHost = document.getElementById('investorsHost');
+      var inviteForm = document.getElementById('inviteForm');
+      var inviteEmail = document.getElementById('inviteEmail');
+      var inviteMsg = document.getElementById('inviteMsg');
       var refreshTimer = null;
       var allRows = [];
 
@@ -127,9 +163,96 @@
       function showAdminView(){
         gateView.style.display = 'none';
         adminView.style.display = '';
+        loadInvestors();
         if (!refreshTimer){
           refreshTimer = setInterval(loadRequests, 60000);
         }
+      }
+
+      function investorRowHTML(inv){
+        return '<tr>'
+          + '<td>' + escapeHTML(inv.email) + '</td>'
+          + '<td>' + fmtDate(inv.created_at) + '</td>'
+          + '<td>' + (inv.last_sign_in_at ? fmtDate(inv.last_sign_in_at) : '—') + '</td>'
+          + '<td><button type="button" class="revoke-investor-btn" data-id="' + escapeHTML(inv.id) + '" data-email="' + escapeHTML(inv.email) + '">Revoke Access</button></td>'
+          + '</tr>';
+      }
+
+      function renderInvestors(investors){
+        if (!investors.length){
+          investorsHost.innerHTML = '<div class="empty-state">No investors yet.</div>';
+          return;
+        }
+
+        investorsHost.innerHTML =
+          '<table class="investors-table"><thead><tr>'
+          + '<th>Email</th><th>Created</th><th>Last sign in</th><th></th>'
+          + '</tr></thead><tbody>'
+          + investors.map(investorRowHTML).join('')
+          + '</tbody></table>';
+
+        investorsHost.querySelectorAll('.revoke-investor-btn').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            handleRevokeInvestor(btn.dataset.id, btn.dataset.email, btn);
+          });
+        });
+      }
+
+      function loadInvestors(){
+        return fetch('/api/admin/investors', { credentials: 'include', cache: 'no-store' })
+          .then(function(res){
+            if (res.status === 401){
+              showGate();
+              return;
+            }
+            if (!res.ok){
+              investorsHost.innerHTML = '<div class="empty-state">Could not load investors.</div>';
+              return;
+            }
+            return res.json().then(function(investors){
+              renderInvestors(investors);
+            });
+          })
+          .catch(function(){
+            investorsHost.innerHTML = '<div class="empty-state">Could not load investors.</div>';
+          });
+      }
+
+      function handleRevokeInvestor(userId, email, btn){
+        var confirmed = window.confirm(
+          'Permanently delete ' + email + '’s account? This cannot be undone — ' +
+          'they will need a brand new invite to regain access.'
+        );
+        if (!confirmed) return;
+
+        var original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Revoking...';
+
+        fetch('/api/admin/revoke', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ userId: userId })
+        })
+          .then(function(res){
+            if (res.status === 401){
+              showGate();
+              return;
+            }
+            if (!res.ok){
+              alert('Could not revoke access.');
+              btn.disabled = false;
+              btn.textContent = original;
+              return;
+            }
+            loadInvestors();
+          })
+          .catch(function(){
+            alert('Could not revoke access.');
+            btn.disabled = false;
+            btn.textContent = original;
+          });
       }
 
       function rowHTML(r){
@@ -280,6 +403,47 @@
           })
           .catch(function(){
             msg.textContent = 'Incorrect password.';
+          })
+          .finally(function(){
+            btn.textContent = original;
+            btn.disabled = false;
+          });
+      });
+
+      inviteForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var email = inviteEmail.value.trim();
+        if (!email) return;
+
+        var btn = inviteForm.querySelector('.invite-btn');
+        var original = btn.textContent;
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+        inviteMsg.textContent = '';
+
+        fetch('/api/admin/invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email: email })
+        })
+          .then(function(res){
+            if (res.status === 401){
+              showGate();
+              return;
+            }
+            return res.json().then(function(data){
+              if (res.ok){
+                inviteForm.reset();
+                inviteMsg.textContent = 'Invite sent to ' + email + '.';
+                loadInvestors();
+              } else {
+                inviteMsg.textContent = (data && data.error) || 'Could not send invite.';
+              }
+            });
+          })
+          .catch(function(){
+            inviteMsg.textContent = 'Could not send invite.';
           })
           .finally(function(){
             btn.textContent = original;
