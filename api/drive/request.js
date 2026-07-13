@@ -15,6 +15,29 @@ function parseCookies(header) {
   return cookies;
 }
 
+async function sendRequestNotification({ investorEmail, fileName, projectName, isReRequest }) {
+  if (!process.env.RESEND_API_KEY) return;
+  const subject = isReRequest
+    ? `Re-request: ${fileName} — previously declined`
+    : `New access request: ${fileName}`;
+  const body = isReRequest
+    ? `${investorEmail} is re-requesting access to ${fileName} in ${projectName}. This was previously declined.\n\nReview: https://misanpartners.com/admin/`
+    : `${investorEmail} has requested access to ${fileName} in ${projectName}.\n\nApprove or decline: https://misanpartners.com/admin/`;
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'Misan Partners <notifications@misanpartners.com>',
+      to: ['c@misanpartners.com'],
+      subject,
+      text: body,
+    }),
+  });
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -79,23 +102,15 @@ module.exports = async (req, res) => {
     }
   }
 
-  if (wasDeclined) {
-    console.log('[access-request] RE-REQUEST notify c@misanpartners.com:', {
-      subject: `Re-request: ${fileName} — previously declined`,
-      body: `${investorEmail} is re-requesting access to ${fileName} on ${projectName}. Note: this request was previously declined.`,
+  try {
+    await sendRequestNotification({
       investorEmail,
-      fileId,
       fileName,
       projectName,
-      re_requested: true,
+      isReRequest: wasDeclined,
     });
-  } else {
-    console.log('[access-request] notify c@misanpartners.com:', {
-      investorEmail,
-      fileId,
-      fileName,
-      projectName,
-    });
+  } catch (err) {
+    console.log('[access-request] Failed to send notification email:', err.message);
   }
 
   return res.status(200).json({ success: true });
