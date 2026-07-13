@@ -115,7 +115,7 @@
     }
 
     const isVideo = (file.mimeType || '').startsWith('video/');
-    const action = tier === 'locked'
+    const action = tier !== 'open'
       ? `<a href="#" class="lock-l dr-request-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">REQUEST →</a>`
       : `<a href="#" class="open-l dr-download-btn" data-file-id="${escapeHTML(file.id)}" data-tier="${escapeHTML(tier)}">${isVideo ? 'PLAY ▶' : 'Open ↓'}</a>`;
     return `<div class="dr-row">
