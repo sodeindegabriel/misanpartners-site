@@ -30,6 +30,7 @@ async function getGoogleAccessToken() {
   });
 
   const data = await res.json();
+  console.log('[google-auth-debug] status:', res.status, 'response:', JSON.stringify(data));
 
   if (!res.ok) {
     throw new Error(data.error_description || 'Failed to refresh Google access token');
