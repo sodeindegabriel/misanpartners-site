@@ -75,7 +75,12 @@
   // depth: how many '../' levels back to /investors/data/ from current page
   async function fetchJSON(depth, id){
     const prefix = '../'.repeat(depth);
-    const r = await fetch(prefix + 'data/' + id + '.json', { cache: 'no-store' });
+    const r = await fetch(prefix + 'data/' + id + '.json', { cache: 'no-store', credentials: 'include' });
+    const contentType = r.headers.get('content-type') || '';
+    if (r.status === 401 || (r.redirected && !contentType.includes('application/json'))) {
+      window.location.href = '/investors/';
+      return null;
+    }
     if (!r.ok) throw new Error('failed to load ' + id);
     return await r.json();
   }
@@ -147,7 +152,7 @@
     }
 
     try {
-      const res = await fetch('/api/drive/files?folderId=' + encodeURIComponent(folderId));
+      const res = await fetch('/api/drive/files?folderId=' + encodeURIComponent(folderId), { credentials: 'include' });
       if (res.status === 401){
         window.location.href = '/investors/';
         return;
@@ -168,7 +173,7 @@
   async function handleDownload(fileId, tier){
     const url = '/api/drive/download?fileId=' + encodeURIComponent(fileId) + '&tier=' + encodeURIComponent(tier);
     try {
-      const res = await fetch(url, { redirect: 'manual' });
+      const res = await fetch(url, { redirect: 'manual', credentials: 'include' });
       if (res.status === 401){
         window.location.href = '/investors/';
         return;
@@ -197,7 +202,8 @@
       const res = await fetch('/api/drive/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileId, fileName, projectName })
+        body: JSON.stringify({ fileId, fileName, projectName }),
+        credentials: 'include'
       });
       if (res.status === 401){
         window.location.href = '/investors/';
