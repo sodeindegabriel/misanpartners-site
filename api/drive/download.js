@@ -23,8 +23,6 @@ async function getGoogleAccessToken() {
     grant_type: 'refresh_token',
   });
 
-  console.log('[google-auth-debug] sending grant_type: refresh_token, has_refresh_token:', !!process.env.GOOGLE_REFRESH_TOKEN, 'refresh_token_preview:', process.env.GOOGLE_REFRESH_TOKEN?.slice(0, 20));
-
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
