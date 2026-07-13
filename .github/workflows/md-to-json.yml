@@ -1,0 +1,39 @@
+name: MD to JSON
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'AXD_source.md'
+      - 'Galatians_source.md'
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run md-to-json
+        run: npm run md-to-json
+
+      - name: Commit and push updated JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add investors/data/axd.json investors/data/galatians.json
+          if git diff --cached --quiet; then
+            echo "No JSON changes to commit."
+          else
+            git commit -m "Auto-update JSON from source markdown [skip ci]"
+            git push
+          fi

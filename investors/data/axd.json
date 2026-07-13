@@ -5,8 +5,10 @@
   "name": "Arena X District",
   "tagline": "West Africa's first 15,000-seat arena, in a 9.25 ha mixed-use district. Alaro City, Lagos.",
   "stage": "Pre-Development",
-  "entities": ["Misan Spaces Limited (DevCo)", "AXD Lagos Limited (SPV)"],
-
+  "entities": [
+    "Misan Spaces Limited (DevCo)",
+    "AXD Lagos Limited (SPV)"
+  ],
   "raise": {
     "phase_label": "Phase 1 Pre-Development",
     "target_usd": 3000000,
@@ -14,117 +16,300 @@
     "pipeline_usd": 2450000,
     "pipeline_note": "Gap to target ($3M target less $550k committed)",
     "tranches": [
-      { "label": "Seed",       "usd": 250000,  "status": "complete" },
-      { "label": "Tranche 2",  "usd": 1500000, "status": "in_progress" },
-      { "label": "Full close", "usd": 3000000, "status": "upcoming" }
+      {
+        "label": "Seed",
+        "usd": 250000,
+        "status": "complete"
+      },
+      {
+        "label": "Tranche 2",
+        "usd": 1500000,
+        "status": "in_progress"
+      },
+      {
+        "label": "Full close",
+        "usd": 3000000,
+        "status": "upcoming"
+      }
     ]
   },
-
   "headline_stats": [
-    { "label": "Stage",         "value": "Pre-Development" },
-    { "label": "Round",         "value": "$3M Phase 1" },
-    { "label": "Committed",     "value": "$550k" },
-    { "label": "Targeted open", "value": "2033" }
+    {
+      "label": "Stage",
+      "value": "Pre-Development"
+    },
+    {
+      "label": "Round",
+      "value": "$3M Phase 1"
+    },
+    {
+      "label": "Committed",
+      "value": "$550k"
+    },
+    {
+      "label": "Targeted open",
+      "value": "2033"
+    }
   ],
-
   "team": [
-    { "name": "Chin Okeke",         "role": "Founder" },
-    { "name": "Kelechi Odu",        "role": "Design Partner" },
-    { "name": "Leye Taiwo",         "role": "Development Partner" },
-    { "name": "Brian Efa",          "role": "CFO" },
-    { "name": "Nnenna Onyewuchi",   "role": "Story Architect" }
+    {
+      "name": "Chin Okeke",
+      "role": "Founder"
+    },
+    {
+      "name": "Kelechi Odu",
+      "role": "Design Partner"
+    },
+    {
+      "name": "Leye Taiwo",
+      "role": "Development Partner"
+    },
+    {
+      "name": "Brian Efa",
+      "role": "CFO"
+    },
+    {
+      "name": "Nnenna Onyewuchi",
+      "role": "Story Architect"
+    }
   ],
-
   "partners": [
-    { "name": "Francis Kéré Architecture", "role": "Lead Architect" },
-    { "name": "CAA ICON",                  "role": "Strategic Consulting" },
-    { "name": "Alaro City / Rendeavour",   "role": "Site Partner" }
+    {
+      "name": "Francis Kéré Architecture",
+      "role": "Lead Architect"
+    },
+    {
+      "name": "CAA ICON",
+      "role": "Strategic Consulting"
+    },
+    {
+      "name": "Alaro City / Rendeavour",
+      "role": "Site Partner"
+    }
   ],
-
   "milestones": [
-    { "id": "m1",  "title": "Site secured · 9.25 ha, Alaro City",            "date": "Oct 2024", "status": "complete" },
-    { "id": "m2",  "title": "Kéré Architecture engaged",                     "date": "Jan 2026", "status": "complete" },
-    { "id": "m3",  "title": "CAA ICON engaged",                              "date": "Feb 2026", "status": "complete" },
-    { "id": "m4",  "title": "Kéré & CAA ICON inaugural site visit",          "date": "Jan 2026", "status": "complete" },
-    { "id": "m5",  "title": "Nnenna Onyewuchi joins as Story Architect",     "date": "Mar 2026", "status": "complete" },
-    { "id": "m6",  "title": "Brian Efa joins as CFO",                        "date": "Apr 2026", "status": "complete" },
-    { "id": "m7",  "title": "Corporate structure complete · DevCo + SPV",    "date": "Apr 2026", "status": "complete" },
-    { "id": "m8",  "title": "Seed close complete · $250k",                   "date": "Jan 2026", "status": "complete" },
-    { "id": "m9",  "title": "$550k total committed",                         "date": "Apr 2026", "status": "complete" },
-    { "id": "m10", "title": "Geotechnical, topographical & traffic studies", "date": "Mar 2026", "status": "complete" },
-    { "id": "m11", "title": "Preliminary EIA report complete",               "date": "May 2026", "status": "complete" },
-    { "id": "m12", "title": "Kéré RIBA Stage 1 · internal review",           "date": "May 2026", "status": "in_progress",
-      "progress_pct": 25, "note": "Week 2 of 8-week review before authorising Stage 2." },
-    { "id": "m13", "title": "Audience Study · fieldwork",                    "date": "Q2 2026",  "status": "in_progress" },
-    { "id": "m14", "title": "Lekki Corridor Market Study",                   "date": "Q2 2026",  "status": "in_progress" },
-    { "id": "m15", "title": "Full Environmental Impact Assessment",          "date": "Q3 2026",  "status": "in_progress" },
-    { "id": "m16", "title": "Quantity Surveyor engagement",                  "date": "Q2 2026",  "status": "upcoming" },
-    { "id": "m17", "title": "RIBA Stage 2 · Concept Design",                 "date": "Q3 2026",  "status": "upcoming" },
-    { "id": "m18", "title": "Phase 1 close · $3M",                           "date": "Q4 2026",  "status": "upcoming" },
-    { "id": "m19", "title": "Development Approval · Alaro",                  "date": "Q3 2027",  "status": "upcoming" }
+    {
+      "id": "m1",
+      "title": "Site secured · 9.25 ha, Alaro City",
+      "date": "Oct 2024",
+      "status": "complete"
+    },
+    {
+      "id": "m2",
+      "title": "Kéré Architecture engaged",
+      "date": "Jan 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m3",
+      "title": "CAA ICON engaged",
+      "date": "Feb 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m4",
+      "title": "Kéré & CAA ICON inaugural site visit",
+      "date": "Jan 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m5",
+      "title": "Nnenna Onyewuchi joins as Story Architect",
+      "date": "Mar 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m6",
+      "title": "Brian Efa joins as CFO",
+      "date": "Apr 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m7",
+      "title": "Corporate structure complete · DevCo + SPV",
+      "date": "Apr 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m8",
+      "title": "Seed close complete · $250k",
+      "date": "Jan 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m9",
+      "title": "$550k total committed",
+      "date": "Apr 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m10",
+      "title": "Geotechnical, topographical & traffic studies",
+      "date": "Mar 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m11",
+      "title": "Preliminary EIA report complete",
+      "date": "May 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m12",
+      "title": "Kéré RIBA Stage 1 · internal review",
+      "date": "May 2026",
+      "status": "in_progress",
+      "progress_pct": 25,
+      "note": "Week 2 of 8-week review before authorising Stage 2."
+    },
+    {
+      "id": "m13",
+      "title": "Audience Study · fieldwork",
+      "date": "Q2 2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "m14",
+      "title": "Lekki Corridor Market Study",
+      "date": "Q2 2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "m15",
+      "title": "Full Environmental Impact Assessment",
+      "date": "Q3 2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "m16",
+      "title": "Quantity Surveyor engagement",
+      "date": "Q2 2026",
+      "status": "upcoming"
+    },
+    {
+      "id": "m17",
+      "title": "RIBA Stage 2 · Concept Design",
+      "date": "Q3 2026",
+      "status": "upcoming"
+    },
+    {
+      "id": "m18",
+      "title": "Phase 1 close · $3M",
+      "date": "Q4 2026",
+      "status": "upcoming"
+    },
+    {
+      "id": "m19",
+      "title": "Development Approval · Alaro",
+      "date": "Q3 2027",
+      "status": "upcoming"
+    }
   ],
-
   "dfi_conversations": [
-    { "name": "EBRD", "stage": "Early engagement · technical assistance / project preparation" },
-    { "name": "IFC",  "stage": "Early engagement · technical assistance / project preparation" },
-    { "name": "AfDB", "stage": "Early engagement · technical assistance / project preparation" }
+    {
+      "name": "EBRD",
+      "stage": "Early engagement · technical assistance / project preparation"
+    },
+    {
+      "name": "IFC",
+      "stage": "Early engagement · technical assistance / project preparation"
+    },
+    {
+      "name": "AfDB",
+      "stage": "Early engagement · technical assistance / project preparation"
+    }
   ],
-
   "updates": [
-    { "id": "u-2026-05", "date": "May 2026", "title": "May 2026 investor update",
+    {
+      "id": "u-2026-05",
+      "date": "May 2026",
+      "title": "May 2026 investor update",
       "summary": "Brian Efa joins as CFO. Corporate structure complete. Kéré RIBA Stage 1 in internal review. $550k committed; targeting +$1M by end of June. DFI conversations opened with EBRD, IFC, AfDB.",
-      "document_id": "d-update-2026-05" },
-    { "id": "u-2026-03", "date": "March 2026", "title": "March 2026 investor update",
+      "document_id": "d-update-2026-05"
+    },
+    {
+      "id": "u-2026-03",
+      "date": "March 2026",
+      "title": "March 2026 investor update",
       "summary": "Kéré & CAA ICON inaugural site visit completed (Jan 16-21). Nnenna Onyewuchi joins as Story Architect. Traffic study and topographical survey delivered; EIA underway with Ministry of Environment site visit. $250k raised; $210k deployed. 47% of 12-month milestones complete.",
-      "document_id": "d-update-2026-03" }
+      "document_id": "d-update-2026-03"
+    }
   ],
-
   "data_room": {
     "source": "google_drive",
     "note": "Production should read folders directly via the Drive API. Folder tiers below are the defaults; per-folder Drive sharing overrides for individual investors.",
     "folders": [
       {
-        "id": "f1", "number": "01", "title": "AXD Overview",
+        "id": "f1",
+        "number": "01",
+        "title": "AXD Overview",
         "tier": "open",
         "drive_url": "https://drive.google.com/drive/folders/1EqbFWHvnTcEDOz8m9n_UPC0RvbimIJHM",
         "documents": [
-          { "id": "d-update-2026-05", "title": "AXD Investor Update · May 2026",  "type": "PDF", "date": "May 2026" },
-          { "id": "d-update-2026-03", "title": "AXD Investor Update · March 2026","type": "PDF", "date": "Mar 2026" },
-          { "id": "d-proposition",    "title": "AXD Investment Proposition",       "type": "PDF", "date": "Dec 2025" }
+          {
+            "id": "d-update-2026-05",
+            "title": "AXD Investor Update · May 2026",
+            "type": "PDF",
+            "date": "May 2026"
+          },
+          {
+            "id": "d-update-2026-03",
+            "title": "AXD Investor Update · March 2026",
+            "type": "PDF",
+            "date": "Mar 2026"
+          },
+          {
+            "id": "d-proposition",
+            "title": "AXD Investment Proposition",
+            "type": "PDF",
+            "date": "Dec 2025"
+          }
         ]
       },
       {
-        "id": "f2", "number": "02", "title": "Investment Terms",
+        "id": "f2",
+        "number": "02",
+        "title": "Investment Terms",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/1xqk49_hJDzBQDyjh48OvEaY83ogpzHfX",
         "documents": []
       },
       {
-        "id": "f3", "number": "03", "title": "Corporate & Legal",
+        "id": "f3",
+        "number": "03",
+        "title": "Corporate & Legal",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/1eNE1sxzkYRr7kZ4Tt1N-ANHrwMUPyqKx",
         "documents": []
       },
       {
-        "id": "f4", "number": "04", "title": "Design & Technical",
+        "id": "f4",
+        "number": "04",
+        "title": "Design & Technical",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/1UYkO9Pu_U8JJmfA3pK-gIufrnmMr4Dhu",
         "documents": []
       },
       {
-        "id": "f5", "number": "05", "title": "Market & Feasibility",
+        "id": "f5",
+        "number": "05",
+        "title": "Market & Feasibility",
         "tier": "mixed",
         "drive_url": "https://drive.google.com/drive/folders/1mrlt8PeV4whaVNMk931Jz8WM4uMumxFt",
         "documents": []
       },
       {
-        "id": "f6", "number": "06", "title": "Financial Model",
+        "id": "f6",
+        "number": "06",
+        "title": "Financial Model",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/1XejNtbn_EV1RPNzqC8lOgg6qGPlkwLim",
         "documents": []
       },
       {
-        "id": "f7", "number": "07", "title": "Team & Partners",
+        "id": "f7",
+        "number": "07",
+        "title": "Team & Partners",
         "tier": "open",
         "drive_url": "https://drive.google.com/drive/folders/1d2PfchPYaCfrHUPByhmN7PpyscUkUaj3",
         "documents": []

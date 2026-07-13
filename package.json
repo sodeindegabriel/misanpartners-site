@@ -2,6 +2,9 @@
   "name": "misanpartners-site",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "md-to-json": "node scripts/md-to-json.js"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0"
   }
