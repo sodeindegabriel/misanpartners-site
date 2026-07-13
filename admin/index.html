@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon-180.png">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <title>Admin — Misan Partners</title>
+  <meta name="robots" content="noindex">
+  <style>
+    .admin-wrap{max-width:1100px;margin:0 auto;padding:56px 24px 80px;position:relative;z-index:1}
+    .admin-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:10px}
+    .admin-head h1{font-size:22px;font-weight:300}
+    .admin-refresh{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--w40)}
+    .requests-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--w10);
+      border-radius:14px;overflow:hidden;font-size:13px}
+    .requests-table th{text-align:left;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--w40);font-weight:400;padding:14px 16px;border-bottom:1px solid var(--w10)}
+    .requests-table td{padding:14px 16px;border-bottom:1px solid var(--w10);color:rgba(255,255,255,.85);vertical-align:middle}
+    .requests-table tr:last-child td{border-bottom:0}
+    .requests-table tr.approved{background:rgba(34,197,94,.08)}
+    .requests-table tr.declined{background:rgba(239,68,68,.08)}
+    .status-badge{font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:4px 9px;border-radius:20px;display:inline-block}
+    .status-badge.pending{color:rgba(251,191,36,.9);background:rgba(251,191,36,.12)}
+    .status-badge.approved{color:rgba(34,197,94,.9);background:rgba(34,197,94,.15)}
+    .status-badge.declined{color:rgba(239,68,68,.9);background:rgba(239,68,68,.15)}
+    .row-actions{display:flex;gap:8px}
+    .row-actions button{font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+      padding:7px 12px;border-radius:8px;border:1px solid var(--w10);background:transparent;color:#fff;
+      cursor:pointer;transition:background .2s}
+    .row-actions .approve-btn:hover{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.4)}
+    .row-actions .decline-btn:hover{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.4)}
+    .empty-state{padding:40px;text-align:center;color:var(--w40);font-size:13px;background:var(--card);
+      border:1px solid var(--w10);border-radius:14px}
+    .table-scroll{overflow-x:auto}
+    @media (max-width:720px){.requests-table{min-width:640px}}
+  </style>
+</head>
+<body>
+  <div class="amb"></div>
+
+  <main class="gate" id="gateView">
+    <div class="gate-card">
+      <span class="orb mini"></span>
+      <div style="font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:28px">Misan Admin</div>
+      <form class="gate-form" id="adminForm" autocomplete="off" novalidate>
+        <label class="field">
+          <span class="flabel">Password</span>
+          <input type="password" name="password" id="adminPassword" required autocomplete="current-password" placeholder="••••••••">
+        </label>
+        <button type="submit" class="enter">Enter</button>
+      </form>
+      <p class="gate-msg" id="adminMsg" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <main id="adminView" style="display:none">
+    <div class="admin-wrap">
+      <div class="admin-head">
+        <h1>Access requests</h1>
+        <div class="admin-refresh">Auto-refreshing · every 60s</div>
+      </div>
+      <div class="table-scroll" id="tableHost"></div>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      'use strict';
+
+      var gateView = document.getElementById('gateView');
+      var adminView = document.getElementById('adminView');
+      var form = document.getElementById('adminForm');
+      var msg = document.getElementById('adminMsg');
+      var tableHost = document.getElementById('tableHost');
+      var refreshTimer = null;
+
+      function escapeHTML(s){
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+          return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+        });
+      }
+
+      function fmtDate(iso){
+        if (!iso) return '';
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return escapeHTML(iso);
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      function showGate(){
+        gateView.style.display = '';
+        adminView.style.display = 'none';
+        if (refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; }
+      }
+
+      function showAdminView(){
+        gateView.style.display = 'none';
+        adminView.style.display = '';
+        if (!refreshTimer){
+          refreshTimer = setInterval(loadRequests, 60000);
+        }
+      }
+
+      function rowHTML(r){
+        var status = r.status || 'pending';
+        var rowClass = status === 'approved' ? 'approved' : status === 'declined' ? 'declined' : '';
+        var actions = status === 'pending'
+          ? '<div class="row-actions">'
+            + '<button type="button" class="approve-btn" data-id="' + escapeHTML(r.id) + '" data-action="approved">Approve</button>'
+            + '<button type="button" class="decline-btn" data-id="' + escapeHTML(r.id) + '" data-action="declined">Decline</button>'
+            + '</div>'
+          : '<span class="status-badge ' + escapeHTML(status) + '">' + escapeHTML(status) + '</span>';
+
+        return '<tr class="' + rowClass + '">'
+          + '<td>' + escapeHTML(r.investor_email) + '</td>'
+          + '<td>' + escapeHTML(r.file_name) + '</td>'
+          + '<td>' + escapeHTML(r.project_name) + '</td>'
+          + '<td>' + fmtDate(r.created_at) + '</td>'
+          + '<td>' + actions + '</td>'
+          + '</tr>';
+      }
+
+      function renderTable(rows){
+        if (!rows.length){
+          tableHost.innerHTML = '<div class="empty-state">No access requests yet.</div>';
+          return;
+        }
+
+        tableHost.innerHTML =
+          '<table class="requests-table"><thead><tr>'
+          + '<th>Investor</th><th>File</th><th>Project</th><th>Requested</th><th>Status</th>'
+          + '</tr></thead><tbody>'
+          + rows.map(rowHTML).join('')
+          + '</tbody></table>';
+
+        tableHost.querySelectorAll('.approve-btn, .decline-btn').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            handleAction(btn.dataset.id, btn.dataset.action, btn);
+          });
+        });
+      }
+
+      function loadRequests(){
+        return fetch('/api/admin/requests', { credentials: 'include', cache: 'no-store' })
+          .then(function(res){
+            if (res.status === 401){
+              showGate();
+              return;
+            }
+            if (!res.ok){
+              showAdminView();
+              tableHost.innerHTML = '<div class="empty-state">Could not load requests.</div>';
+              return;
+            }
+            return res.json().then(function(rows){
+              showAdminView();
+              renderTable(rows);
+            });
+          })
+          .catch(function(){
+            showAdminView();
+            tableHost.innerHTML = '<div class="empty-state">Could not load requests.</div>';
+          });
+      }
+
+      function handleAction(requestId, action, btn){
+        var actionsCell = btn.closest('.row-actions');
+        if (actionsCell) actionsCell.style.opacity = '.5';
+
+        fetch('/api/admin/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ requestId: requestId, action: action })
+        })
+          .then(function(res){
+            if (res.status === 401){
+              showGate();
+              return;
+            }
+            if (!res.ok){
+              alert('Could not update request.');
+              if (actionsCell) actionsCell.style.opacity = '';
+              return;
+            }
+            loadRequests();
+          })
+          .catch(function(){
+            alert('Could not update request.');
+            if (actionsCell) actionsCell.style.opacity = '';
+          });
+      }
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        var password = document.getElementById('adminPassword').value;
+        var btn = form.querySelector('.enter');
+        var original = btn.textContent;
+        btn.textContent = 'Checking...';
+        btn.disabled = true;
+        msg.textContent = '';
+
+        fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ password: password })
+        })
+          .then(function(res){
+            if (res.ok){
+              form.reset();
+              return loadRequests();
+            }
+            msg.textContent = 'Incorrect password.';
+          })
+          .catch(function(){
+            msg.textContent = 'Incorrect password.';
+          })
+          .finally(function(){
+            btn.textContent = original;
+            btn.disabled = false;
+          });
+      });
+
+      // if already authenticated (existing misan_admin cookie), skip straight to the table
+      loadRequests();
+    })();
+  </script>
+</body>
+</html>
