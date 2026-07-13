@@ -116,13 +116,51 @@
 
     const isVideo = (file.mimeType || '').startsWith('video/');
     const action = tier === 'locked'
-      ? `<a href="#" class="lock-l dr-request-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">Request</a>`
+      ? `<a href="#" class="lock-l dr-request-btn" data-file-id="${escapeHTML(file.id)}" data-file-name="${escapeHTML(file.name)}">REQUEST →</a>`
       : `<a href="#" class="open-l dr-download-btn" data-file-id="${escapeHTML(file.id)}" data-tier="${escapeHTML(tier)}">${isVideo ? 'PLAY ▶' : 'Open ↓'}</a>`;
     return `<div class="dr-row">
       <span class="n">${escapeHTML(file.name)}</span>
       <span class="meta">${escapeHTML(type)}</span>
       ${action}
     </div>`;
+  }
+
+  async function checkFileAccess(btn){
+    const fileId = btn.dataset.fileId;
+
+    try {
+      const res = await fetch('/api/drive/access?fileId=' + encodeURIComponent(fileId), { credentials: 'include' });
+      if (res.status === 401){
+        window.location.href = '/investors/';
+        return;
+      }
+      if (!res.ok) return;
+
+      const { status } = await res.json();
+
+      if (status === 'approved'){
+        const openBtn = document.createElement('a');
+        openBtn.href = '#';
+        openBtn.className = 'open-l dr-download-btn';
+        openBtn.dataset.fileId = fileId;
+        openBtn.dataset.tier = 'open';
+        openBtn.textContent = 'OPEN ↓';
+        openBtn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleDownload(openBtn.dataset.fileId, openBtn.dataset.tier, openBtn);
+        });
+        btn.replaceWith(openBtn);
+      } else if (status === 'pending'){
+        btn.textContent = 'Requested ✓';
+        btn.dataset.done = 'true';
+        btn.style.color = 'rgba(255,255,255,.35)';
+        btn.style.pointerEvents = 'none';
+      }
+      // status === 'none' — leave the button as the default "REQUEST →"
+    } catch(e){
+      console.error('Access check failed:', fileId, e);
+    }
   }
 
   function bindRowActions(containerEl){
@@ -139,6 +177,7 @@
         e.stopPropagation();
         handleRequestAccess(btn, btn.dataset.fileId, btn.dataset.fileName);
       });
+      checkFileAccess(btn);
     });
     containerEl.querySelectorAll('.dr-folder-open-btn').forEach(btn => {
       btn.addEventListener('click', e => {
