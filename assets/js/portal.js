@@ -73,16 +73,30 @@
   // ---------------------- data load ----------------------
 
   // depth: how many '../' levels back to /investors/data/ from current page
-  async function fetchJSON(depth, id){
-    const prefix = '../'.repeat(depth);
-    const r = await fetch(prefix + 'data/' + id + '.json', { cache: 'no-store', credentials: 'include' });
-    const contentType = r.headers.get('content-type') || '';
-    if (r.status === 401 || (r.redirected && !contentType.includes('application/json'))) {
-      window.location.href = '/investors/';
+  async function fetchJSON(depth, id) {
+    const prefix = depth === 1 ? '../' : '../../';
+    const url = `${prefix}data/${id}.json`;
+    console.log('[fetchJSON] fetching:', url, 'full path:', window.location.origin + '/investors/data/' + id + '.json');
+    try {
+      const r = await fetch(url, { credentials: 'include' });
+      console.log('[fetchJSON] response status:', r.status, 'redirected:', r.redirected, 'content-type:', r.headers.get('content-type'), 'url:', r.url);
+      const contentType = r.headers.get('content-type') || '';
+      if (r.status === 401 || (r.redirected && !contentType.includes('application/json'))) {
+        console.log('[fetchJSON] redirected to login, going to /investors/');
+        window.location.href = '/investors/';
+        return null;
+      }
+      if (!r.ok) {
+        console.log('[fetchJSON] not ok:', r.status);
+        return null;
+      }
+      const data = await r.json();
+      console.log('[fetchJSON] success, got data:', Object.keys(data));
+      return data;
+    } catch (err) {
+      console.log('[fetchJSON] error:', err.message);
       return null;
     }
-    if (!r.ok) throw new Error('failed to load ' + id);
-    return await r.json();
   }
 
   async function loadProjects(depth){
