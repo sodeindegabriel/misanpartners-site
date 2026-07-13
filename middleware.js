@@ -1,5 +1,5 @@
 export const config = {
-  matcher: ['/investors/portal/:path*', '/investors/data/:path*'],
+  matcher: ['/investors/portal/:path*', '/investors/data/:file(.*\\.json)'],
 };
 
 function parseCookies(header) {
