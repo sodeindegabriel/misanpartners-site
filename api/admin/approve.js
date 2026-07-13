@@ -57,7 +57,7 @@ module.exports = async (req, res) => {
   }
 
   const { requestId, action } = req.body || {};
-  const validActions = ['approved', 'declined', 'revoked', 'pending'];
+  const validActions = ['approved', 'declined', 'revoked'];
 
   if (!requestId || !validActions.includes(action)) {
     return res.status(400).json({ error: 'Invalid request' });

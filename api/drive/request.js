@@ -42,23 +42,61 @@ module.exports = async (req, res) => {
 
   const investorEmail = userData.user.email;
 
-  const { error: insertError } = await supabase.from('access_requests').insert({
-    investor_email: investorEmail,
-    file_id: fileId,
-    file_name: fileName,
-    project_name: projectName,
-  });
+  const { data: existingRows, error: existingError } = await supabase
+    .from('access_requests')
+    .select('id, status')
+    .eq('investor_email', investorEmail)
+    .eq('file_id', fileId)
+    .order('created_at', { ascending: false })
+    .limit(1);
 
-  if (insertError) {
+  if (existingError) {
     return res.status(500).json({ error: 'Failed to save access request' });
   }
 
-  console.log('[access-request] notify c@misanpartners.com:', {
-    investorEmail,
-    fileId,
-    fileName,
-    projectName,
-  });
+  const existingRow = existingRows && existingRows[0];
+  const wasDeclined = existingRow && existingRow.status === 'declined';
+
+  if (existingRow) {
+    const { error: updateError } = await supabase
+      .from('access_requests')
+      .update({ status: 'pending' })
+      .eq('id', existingRow.id);
+
+    if (updateError) {
+      return res.status(500).json({ error: 'Failed to save access request' });
+    }
+  } else {
+    const { error: insertError } = await supabase.from('access_requests').insert({
+      investor_email: investorEmail,
+      file_id: fileId,
+      file_name: fileName,
+      project_name: projectName,
+    });
+
+    if (insertError) {
+      return res.status(500).json({ error: 'Failed to save access request' });
+    }
+  }
+
+  if (wasDeclined) {
+    console.log('[access-request] RE-REQUEST notify c@misanpartners.com:', {
+      subject: `Re-request: ${fileName} — previously declined`,
+      body: `${investorEmail} is re-requesting access to ${fileName} on ${projectName}. Note: this request was previously declined.`,
+      investorEmail,
+      fileId,
+      fileName,
+      projectName,
+      re_requested: true,
+    });
+  } else {
+    console.log('[access-request] notify c@misanpartners.com:', {
+      investorEmail,
+      fileId,
+      fileName,
+      projectName,
+    });
+  }
 
   return res.status(200).json({ success: true });
 };

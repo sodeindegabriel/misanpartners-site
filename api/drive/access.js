@@ -48,9 +48,14 @@ module.exports = async (req, res) => {
   }
 
   const latest = data && data[0];
-  const status = latest && latest.status === 'approved' ? 'approved'
-    : latest && latest.status === 'pending' ? 'pending'
-    : 'none';
+  let status = 'none';
+
+  if (latest) {
+    if (latest.status === 'approved') status = 'approved';
+    else if (latest.status === 'pending') status = 'pending';
+    else if (latest.status === 'declined') status = 'declined';
+    // 'revoked' (or any other value) falls through to 'none'
+  }
 
   return res.status(200).json({ status });
 };
