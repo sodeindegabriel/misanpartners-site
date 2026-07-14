@@ -65,11 +65,12 @@
       color:var(--w40);font-weight:400;padding:14px 16px;border-bottom:1px solid var(--w10)}
     .investors-table td{padding:14px 16px;border-bottom:1px solid var(--w10);color:rgba(255,255,255,.85);vertical-align:middle}
     .investors-table tr:last-child td{border-bottom:0}
-    .revoke-investor-btn{font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    .revoke-investor-btn,.resend-invite-btn{font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
       padding:7px 12px;border-radius:8px;border:1px solid var(--w10);background:transparent;color:#fff;
       cursor:pointer;transition:background .2s}
     .revoke-investor-btn:hover{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.4)}
-    .revoke-investor-btn:disabled{opacity:.5;cursor:default}
+    .resend-invite-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3)}
+    .revoke-investor-btn:disabled,.resend-invite-btn:disabled{opacity:.5;cursor:default}
     @media (max-width:720px){.requests-table{min-width:640px}.investors-table{min-width:520px}}
   </style>
 </head>
@@ -173,8 +174,11 @@
         return '<tr>'
           + '<td>' + escapeHTML(inv.email) + '</td>'
           + '<td>' + fmtDate(inv.created_at) + '</td>'
-          + '<td>' + (inv.last_sign_in_at ? fmtDate(inv.last_sign_in_at) : '—') + '</td>'
-          + '<td><button type="button" class="revoke-investor-btn" data-id="' + escapeHTML(inv.id) + '" data-email="' + escapeHTML(inv.email) + '">Revoke Access</button></td>'
+          + '<td>' + (inv.last_sign_in_at ? fmtDate(inv.last_sign_in_at) : 'Never signed in') + '</td>'
+          + '<td>'
+          + '<button type="button" class="resend-invite-btn" data-email="' + escapeHTML(inv.email) + '">Resend Invite</button> '
+          + '<button type="button" class="revoke-investor-btn" data-id="' + escapeHTML(inv.id) + '" data-email="' + escapeHTML(inv.email) + '">Revoke Access</button>'
+          + '</td>'
           + '</tr>';
       }
 
@@ -190,6 +194,12 @@
           + '</tr></thead><tbody>'
           + investors.map(investorRowHTML).join('')
           + '</tbody></table>';
+
+        investorsHost.querySelectorAll('.resend-invite-btn').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            handleResendInvite(btn.dataset.email, btn);
+          });
+        });
 
         investorsHost.querySelectorAll('.revoke-investor-btn').forEach(function(btn){
           btn.addEventListener('click', function(){
@@ -223,6 +233,43 @@
           .catch(function(err){
             console.log('loadInvestors error:', err);
             investorsHost.innerHTML = '<div class="empty-state">Could not load investors.</div>';
+          });
+      }
+
+      function handleResendInvite(email, btn){
+        var confirmed = window.confirm('Resend invite to ' + email + '?');
+        if (!confirmed) return;
+
+        var original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        inviteMsg.textContent = '';
+
+        fetch('/api/admin/invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email: email })
+        })
+          .then(function(res){
+            if (res.status === 401){
+              showGate();
+              return;
+            }
+            return res.json().catch(function(){ return {}; }).then(function(data){
+              if (res.ok){
+                inviteMsg.textContent = 'Invite resent to ' + email;
+              } else {
+                inviteMsg.textContent = (data && data.error) || 'Could not resend invite.';
+              }
+            });
+          })
+          .catch(function(){
+            inviteMsg.textContent = 'Could not resend invite.';
+          })
+          .finally(function(){
+            btn.disabled = false;
+            btn.textContent = original;
           });
       }
 
