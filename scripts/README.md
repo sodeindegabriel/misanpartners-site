@@ -105,6 +105,7 @@ Format: `date | title | summary`.
 ```
 ## Documents
 ### 01 · AXD Overview
+Drive: https://drive.google.com/drive/folders/1EqbFWHvnTcEDOz8m9n_UPC0RvbimIJHM
 - AXD Investor Update · May 2026 | PDF | May 2026
 - AXD Investment Proposition | PDF | Dec 2025
 
@@ -113,17 +114,21 @@ Format: `date | title | summary`.
 ```
 Each `### NN · Folder Title` sub-heading is matched against an **existing** folder in the
 JSON by number, falling back to matching by title. **Folders themselves (id, number,
-title, tier, and Google Drive `drive_url`) are never created or changed here** — only that
-folder's `documents` list is replaced with the bullet lines under its heading, one
-document per line: `- Title | Type | Date`.
+title, tier) are never created here** — only two things about an existing folder can be
+set from markdown:
+
+- An optional `Drive: <url>` line sets that folder's Google Drive `drive_url`. Omit it and
+  the folder's existing `drive_url` is left untouched.
+- The bullet lines under the heading replace that folder's `documents` list, one document
+  per line: `- Title | Type | Date`.
 
 If a folder heading has no bullet lines under it and no `(no documents...)` line, its
 existing document list is left untouched. Write `(no documents ...)` explicitly if you
 want to clear it out.
 
-Since most folders are already wired to a live Google Drive folder (`drive_url` set), this
-section usually only matters for folders that don't have one yet — the portal fetches live
-file listings from Drive directly for anything that does.
+Once a folder has a `drive_url`, the portal fetches its live file listing straight from
+Google Drive — the `documents` list here still matters as a fallback/reference, but stops
+being what investors actually see for that folder.
 
 # Investor invites
 

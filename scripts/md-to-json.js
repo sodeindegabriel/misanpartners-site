@@ -190,6 +190,11 @@ function parseDocuments(lines, existing) {
 
     if (!folder) return; // unknown folder in the markdown — folders themselves are Drive-managed, not created here
 
+    const driveLine = sec.lines.find((l) => /^\s*Drive:/i.test(l));
+    if (driveLine) {
+      folder.drive_url = driveLine.replace(/^\s*Drive:\s*/i, '').trim() || null;
+    }
+
     const docLines = sec.lines.map((l) => l.trim()).filter((l) => l.startsWith('-'));
     const noDocsMarker = sec.lines.some((l) => /\(no documents/i.test(l));
 

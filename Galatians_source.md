@@ -47,14 +47,18 @@ June 2026 | June 2026 progress note | Casting directors Akindoju & Coralie attac
 
 ## Documents
 ### 01 · Pitch & Vision
+Drive: https://drive.google.com/drive/folders/1mib9YU4vAwnZ0D1Q_I17a-d9gBWKLJze
 - Galatians · Pitch Deck 2026 | PDF | 2026
 - Director's Lookbook | PDF | 2025
 
 ### 02 · Script & Treatment
+Drive: https://drive.google.com/drive/folders/1BBYoNGEwMUak4NO5Q3S3YUrmO0aenKpU
 - Treatment & Screenplay | PDF | 2026
 
 ### 03 · Budget & Finance
+Drive: https://drive.google.com/drive/folders/1GWQ61S4t-NVmQLSs1D5eZly1hGu43vRT
 - Budget & Finance Plan | XLSX | Jun 2026
 
 ### 04 · Investment & Legal
+Drive: https://drive.google.com/drive/folders/13aRXKfQcIhGb_LbaQ55QDywu6K7-CCGO
 - Investment Agreement | PDF | 2026

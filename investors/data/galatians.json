@@ -5,9 +5,14 @@
   "name": "Galatians",
   "tagline": "A feature film by Michael Omonua. Satirical drama on faith, performance, and what we choose to believe.",
   "stage": "Financing",
-  "format": { "type": "Feature film", "runtime_min": 110, "language": "English, Pidgin & Local" },
-  "entities": ["Bullish Pictures (SPV)"],
-
+  "format": {
+    "type": "Feature film",
+    "runtime_min": 110,
+    "language": "English, Pidgin & Local"
+  },
+  "entities": [
+    "Bullish Pictures (SPV)"
+  ],
   "raise": {
     "phase_label": "Production Equity",
     "target_usd": 2200000,
@@ -15,87 +20,226 @@
     "pipeline_usd": 1600000,
     "pipeline_note": "MBO Capital and Afrexim in active conversation"
   },
-
   "headline_stats": [
-    { "label": "Stage",            "value": "Financing" },
-    { "label": "Budget",           "value": "$2.2M" },
-    { "label": "Confirmed equity", "value": "$540k · 25%" },
-    { "label": "Sales agent",      "value": "WME Independent" }
+    {
+      "label": "Stage",
+      "value": "Financing"
+    },
+    {
+      "label": "Budget",
+      "value": "$2.2M"
+    },
+    {
+      "label": "Confirmed equity",
+      "value": "$540k · 25%"
+    },
+    {
+      "label": "Sales agent",
+      "value": "WME Independent"
+    }
   ],
-
   "team": [
-    { "name": "Michael Omonua", "role": "Writer / Director" },
-    { "name": "Abba T. Makama", "role": "Producer · Osiris Film & Ent" },
-    { "name": "Chin Okeke",     "role": "Executive Producer" }
+    {
+      "name": "Michael Omonua",
+      "role": "Writer / Director"
+    },
+    {
+      "name": "Abba T. Makama",
+      "role": "Producer · Osiris Film & Ent"
+    },
+    {
+      "name": "Chin Okeke",
+      "role": "Executive Producer"
+    }
   ],
-
   "casting": {
-    "directors": ["Lala Akindoju", "Coralie"],
-    "in_conversation": ["Wunmi Mosaku", "Sam Adegoke"],
+    "directors": [
+      "Lala Akindoju",
+      "Coralie"
+    ],
+    "in_conversation": [
+      "Wunmi Mosaku",
+      "Sam Adegoke"
+    ],
     "note": "Shortlists in place for each principal role."
   },
-
   "partners": [
-    { "name": "WME Independent",    "role": "Sales Agent" },
-    { "name": "La Fabrique Cinéma", "role": "Co-production lab · Cannes 2024" },
-    { "name": "Realness Institute", "role": "Development support" },
-    { "name": "Institut Français",  "role": "Development support" }
+    {
+      "name": "WME Independent",
+      "role": "Sales Agent"
+    },
+    {
+      "name": "La Fabrique Cinéma",
+      "role": "Co-production lab · Cannes 2024"
+    },
+    {
+      "name": "Realness Institute",
+      "role": "Development support"
+    },
+    {
+      "name": "Institut Français",
+      "role": "Development support"
+    }
   ],
-
   "investors": [
-    { "name": "Misan Partners",        "usd": 140000, "status": "confirmed" },
-    { "name": "Gream",                 "usd": 150000, "status": "confirmed" },
-    { "name": "Amplify Capital",       "usd": 150000, "status": "confirmed" },
-    { "name": "Golden Ratio Pictures", "usd": 100000, "status": "confirmed" }
+    {
+      "name": "Misan Partners",
+      "usd": 140000,
+      "status": "confirmed"
+    },
+    {
+      "name": "Gream",
+      "usd": 150000,
+      "status": "confirmed"
+    },
+    {
+      "name": "Amplify Capital",
+      "usd": 150000,
+      "status": "confirmed"
+    },
+    {
+      "name": "Golden Ratio Pictures",
+      "usd": 100000,
+      "status": "confirmed"
+    }
   ],
-
   "milestones": [
-    { "id": "m1", "title": "Atlas Workshop Award · Marrakesh",                "date": "2023",    "status": "complete" },
-    { "id": "m2", "title": "La Fabrique Cinéma selection · Cannes",           "date": "2024",    "status": "complete" },
-    { "id": "m3", "title": "WME Independent attached as sales agent",         "date": "Q1 2026", "status": "complete" },
-    { "id": "m4", "title": "$540k confirmed equity · 4 investors",            "date": "Q2 2026", "status": "complete" },
-    { "id": "m5", "title": "Casting · directors attached, shortlists in place", "date": "2026",  "status": "in_progress",
-      "note": "Lala Akindoju & Coralie casting; Wunmi Mosaku, Sam Adegoke among names in conversation." },
-    { "id": "m6", "title": "UK co-production · 2 partners in discussion",     "date": "2026",    "status": "in_progress" },
-    { "id": "m7", "title": "Institutional close · MBO Capital, Afrexim",      "date": "2026",    "status": "in_progress",
-      "progress_pct": 25, "note": "Pipeline: $1.6M in discussion." },
-    { "id": "m8", "title": "Principal photography · Lagos",                   "date": "2027",    "status": "upcoming" },
-    { "id": "m9", "title": "Festival premiere",                                "date": "2028",    "status": "upcoming" }
+    {
+      "id": "m1",
+      "title": "Atlas Workshop Award · Marrakesh",
+      "date": "2023",
+      "status": "complete"
+    },
+    {
+      "id": "m2",
+      "title": "La Fabrique Cinéma selection · Cannes",
+      "date": "2024",
+      "status": "complete"
+    },
+    {
+      "id": "m3",
+      "title": "WME Independent attached as sales agent",
+      "date": "Q1 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m4",
+      "title": "$540k confirmed equity · 4 investors",
+      "date": "Q2 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m5",
+      "title": "Casting · directors attached, shortlists in place",
+      "date": "2026",
+      "status": "in_progress",
+      "note": "Lala Akindoju & Coralie casting; Wunmi Mosaku, Sam Adegoke among names in conversation."
+    },
+    {
+      "id": "m6",
+      "title": "UK co-production · 2 partners in discussion",
+      "date": "2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "m7",
+      "title": "Institutional close · MBO Capital, Afrexim",
+      "date": "2026",
+      "status": "in_progress",
+      "progress_pct": 25,
+      "note": "Pipeline: $1.6M in discussion."
+    },
+    {
+      "id": "m8",
+      "title": "Principal photography · Lagos",
+      "date": "2027",
+      "status": "upcoming"
+    },
+    {
+      "id": "m9",
+      "title": "Festival premiere",
+      "date": "2028",
+      "status": "upcoming"
+    }
   ],
-
   "updates": [
-    { "id": "u-2026-06", "date": "June 2026", "title": "June 2026 progress note",
+    {
+      "id": "u-2026-06",
+      "date": "June 2026",
+      "title": "June 2026 progress note",
       "summary": "Casting directors Akindoju & Coralie attached; shortlists in place. Two UK co-pro partners in active discussion. Institutional close in motion with MBO Capital and Afrexim.",
-      "document_id": null }
+      "document_id": null
+    }
   ],
-
   "data_room": {
     "source": "google_drive",
     "note": "All four Galatians folders connected to Google Drive.",
     "folders": [
       {
-        "id": "f1", "number": "01", "title": "Pitch & Vision",
+        "id": "f1",
+        "number": "01",
+        "title": "Pitch & Vision",
         "tier": "open",
         "drive_url": "https://drive.google.com/drive/folders/1mib9YU4vAwnZ0D1Q_I17a-d9gBWKLJze",
-        "documents": []
+        "documents": [
+          {
+            "id": "d-galatians-pitch-deck-2026",
+            "title": "Galatians · Pitch Deck 2026",
+            "type": "PDF",
+            "date": "2026"
+          },
+          {
+            "id": "d-directors-lookbook",
+            "title": "Director's Lookbook",
+            "type": "PDF",
+            "date": "2025"
+          }
+        ]
       },
       {
-        "id": "f2", "number": "02", "title": "Script & Treatment",
+        "id": "f2",
+        "number": "02",
+        "title": "Script & Treatment",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/1BBYoNGEwMUak4NO5Q3S3YUrmO0aenKpU",
-        "documents": []
+        "documents": [
+          {
+            "id": "d-treatment-screenplay",
+            "title": "Treatment & Screenplay",
+            "type": "PDF",
+            "date": "2026"
+          }
+        ]
       },
       {
-        "id": "f3", "number": "03", "title": "Budget & Finance",
+        "id": "f3",
+        "number": "03",
+        "title": "Budget & Finance",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/1GWQ61S4t-NVmQLSs1D5eZly1hGu43vRT",
-        "documents": []
+        "documents": [
+          {
+            "id": "d-budget-finance-plan",
+            "title": "Budget & Finance Plan",
+            "type": "XLSX",
+            "date": "Jun 2026"
+          }
+        ]
       },
       {
-        "id": "f4", "number": "04", "title": "Investment & Legal",
+        "id": "f4",
+        "number": "04",
+        "title": "Investment & Legal",
         "tier": "locked",
         "drive_url": "https://drive.google.com/drive/folders/13aRXKfQcIhGb_LbaQ55QDywu6K7-CCGO",
-        "documents": []
+        "documents": [
+          {
+            "id": "d-investment-agreement",
+            "title": "Investment Agreement",
+            "type": "PDF",
+            "date": "2026"
+          }
+        ]
       }
     ]
   }
