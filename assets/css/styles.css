@@ -92,6 +92,7 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
   font-family:inherit;font-size:14px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:background .3s}
 .enter:hover{background:rgba(255,255,255,.9)}
 .micro{margin-top:24px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.micro a{display:inline-block;padding:10px 4px;margin:-10px -4px}
 .gate-msg{margin-top:18px;font-size:12.5px;font-weight:300;color:rgba(255,255,255,.7);min-height:1.2em;line-height:1.5}
 .gate-msg a{color:#fff}
 .backhome{position:absolute;top:40px;left:0;right:0;text-align:center;font-size:13px;letter-spacing:.2em;
@@ -126,15 +127,18 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
 .topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#0a0a0a;
   border-bottom:1px solid var(--w10);display:flex;align-items:center;
   padding:0 32px;z-index:50}
-.topbar .mark{width:130px;height:auto}
-.topbar .crumbs{margin-left:24px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--w40)}
+.topbar .mark{width:130px;height:auto;flex-shrink:0}
+.topbar .crumbs{margin-left:24px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--w40);
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .topbar .crumbs a{color:var(--w40);text-decoration:none;transition:color .25s}
 .topbar .crumbs a:hover{color:#fff}
 .topbar .crumbs .sep{margin:0 10px;color:rgba(255,255,255,.25)}
-.topbar .spacer{flex:1}
+.topbar .spacer{flex:1;min-width:0}
 .topbar .signout{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--w55);
-  text-decoration:none;transition:color .25s}
+  text-decoration:none;transition:color .25s;flex-shrink:0;padding:10px 2px;margin:-10px -2px}
 .topbar .signout:hover{color:#fff}
+
+@media (max-width:600px){.topbar{padding:0 20px}}
 
 /* page chrome */
 .portal{min-height:100vh;background:#000;color:#fff;padding-top:64px;position:relative}
@@ -143,6 +147,8 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
 .wrap{max-width:1280px;margin:0 auto;padding:0 80px;position:relative;z-index:1}
 .foot{padding:32px 80px;text-align:center;font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.25);
   text-transform:uppercase}
+
+@media (max-width:700px){.wrap{padding:0 24px}.foot{padding:32px 24px}}
 
 /* ===================== PORTAL HOME ===================== */
 
@@ -180,12 +186,19 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
 .status-pill.amber .dot{background:var(--amber)}
 
 .card-stats{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--w10)}
-.card-stats > div{padding:22px 36px}
+.card-stats > div{padding:22px 36px;min-width:0}
 .card-stats > div + div{border-left:1px solid var(--w10)}
 .stat-l{font-size:10px;letter-spacing:.24em;color:var(--w40);text-transform:uppercase}
 .stat-v{font-size:18px;font-weight:300;margin-top:6px}
 
 .card-bar{padding:0 36px 18px}
+
+@media (max-width:480px){
+  .card-head{padding:26px 22px 20px}
+  .card-stats > div{padding:18px 22px}
+  .card-bar{padding:0 22px 16px}
+  .card-foot{padding:16px 22px 22px}
+}
 .bar{height:3px;border-radius:2px;background:rgba(255,255,255,.10);overflow:hidden;position:relative}
 .bar .fill{height:100%;border-radius:2px}
 .card.cyan  .bar .fill{background:var(--cyan)}
@@ -214,13 +227,15 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
 
 .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);
   border:1px solid var(--w10);border-radius:14px;margin:36px 0;overflow:hidden}
-.stat-strip > div{padding:20px 28px}
+.stat-strip > div{padding:20px 28px;min-width:0}
 .stat-strip > div + div{border-left:1px solid var(--w10)}
 .stat-strip .l{font-size:10px;letter-spacing:.24em;color:var(--w40);text-transform:uppercase}
 .stat-strip .v{font-size:22px;font-weight:300;margin-top:8px}
 @media (max-width:880px){.stat-strip{grid-template-columns:1fr 1fr}.stat-strip > div + div:nth-child(3){border-left:0;border-top:1px solid var(--w10)}}
+@media (max-width:480px){.stat-strip > div{padding:16px 18px}}
 
 .cols{display:grid;grid-template-columns:1fr 480px;gap:48px;padding-bottom:48px}
+.cols > div{min-width:0}
 @media (max-width:1080px){.cols{grid-template-columns:1fr}}
 
 .section-l{font-size:11px;letter-spacing:.28em;color:var(--w55);text-transform:uppercase;margin-bottom:20px}
@@ -272,11 +287,12 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
 
 /* tranches */
 .tranches{margin-top:18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.tranche{padding:14px 14px;background:#0a0a0a;border:1px solid var(--w10);border-radius:10px;text-align:center}
+.tranche{padding:14px 14px;background:#0a0a0a;border:1px solid var(--w10);border-radius:10px;text-align:center;min-width:0}
 .tranche .l{font-size:10px;letter-spacing:.2em;color:var(--w40);text-transform:uppercase}
 .tranche .v{font-size:16px;font-weight:300;margin-top:4px}
 .tranche .s{margin-top:8px;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase}
 .tranche.complete .s{color:var(--green)}
+@media (max-width:480px){.tranches{grid-template-columns:1fr}}
 .tranche.in_progress .s{color:var(--amber)}
 .proj.cyan .tranche.in_progress .s{color:var(--cyan)}
 .tranche.upcoming .s{color:var(--w40)}
@@ -300,6 +316,7 @@ body{background:#000;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFo
 .dr-head .l{font-size:11px;letter-spacing:.28em;color:var(--w55);text-transform:uppercase}
 .dr-head .h{font-size:14px;color:var(--w55);font-weight:300}
 .dr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.dr-grid > *{min-width:0}
 @media (max-width:1080px){.dr-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:680px){.dr-grid{grid-template-columns:1fr}}
 
