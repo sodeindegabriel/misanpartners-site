@@ -34,6 +34,15 @@
           <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
         </label>
         <button type="submit" class="enter">Enter</button>
+        <p class="micro"><a href="#" id="forgotLink" style="color:inherit;text-decoration:underline;cursor:pointer">Forgot password?</a></p>
+      </form>
+      <form class="gate-form" id="forgotForm" autocomplete="off" novalidate style="display:none">
+        <label class="field">
+          <span class="flabel">Email</span>
+          <input type="email" id="forgotEmail" required autocomplete="email" placeholder="you@example.com">
+        </label>
+        <button type="submit" class="enter">Send Reset Link</button>
+        <p class="micro"><a href="#" id="backToLogin" style="color:inherit;text-decoration:underline;cursor:pointer">Back to sign in</a></p>
       </form>
       <p class="micro">Access by invitation</p>
       <p class="gate-msg" id="gateMsg" role="status" aria-live="polite"></p>
@@ -91,6 +100,60 @@
       if (!accessToken || (type !== 'invite' && type !== 'recovery' && type !== 'signup')) return;
 
       window.location.href = '/investors/setup' + hash;
+    })();
+  </script>
+  <script>
+    (function () {
+      var gateForm = document.getElementById('gateForm');
+      var forgotForm = document.getElementById('forgotForm');
+      var forgotLink = document.getElementById('forgotLink');
+      var backToLogin = document.getElementById('backToLogin');
+      var m = document.getElementById('gateMsg');
+      if (!forgotForm || !forgotLink || !backToLogin) return;
+
+      forgotLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        gateForm.style.display = 'none';
+        forgotForm.style.display = '';
+        m.textContent = '';
+      });
+
+      backToLogin.addEventListener('click', function (e) {
+        e.preventDefault();
+        forgotForm.style.display = 'none';
+        gateForm.style.display = '';
+        m.textContent = '';
+      });
+
+      forgotForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = document.getElementById('forgotEmail').value;
+        var btn = forgotForm.querySelector('.enter');
+        var original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        m.textContent = '';
+
+        fetch('/api/auth/resetpassword', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email }),
+        })
+          .then(function (res) {
+            btn.disabled = false;
+            btn.textContent = original;
+            if (res.ok) {
+              m.textContent = 'Check your email for a reset link.';
+              return;
+            }
+            m.textContent = 'Could not send reset link. Please try again.';
+          })
+          .catch(function () {
+            btn.disabled = false;
+            btn.textContent = original;
+            m.textContent = 'Could not send reset link. Please try again.';
+          });
+      });
     })();
   </script>
 </body>
