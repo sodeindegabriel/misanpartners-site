@@ -13,31 +13,29 @@ const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
 function buildCookie(name, value, maxAge) {
-  const parts = [
+  // Always Secure: Vercel serves every deployment (production and preview)
+  // over HTTPS, and `localhost` is exempted from the Secure requirement by
+  // browsers, so there's no legitimate case where this cookie should ever
+  // be allowed over plain HTTP.
+  return [
     `${name}=${value}`,
     'Path=/',
     'HttpOnly',
     'SameSite=Strict',
     `Max-Age=${maxAge}`,
-  ];
-  if (process.env.NODE_ENV === 'production') {
-    parts.push('Secure');
-  }
-  return parts.join('; ');
+    'Secure',
+  ].join('; ');
 }
 
 function clearCookie(name) {
-  const parts = [
+  return [
     `${name}=`,
     'Path=/',
     'HttpOnly',
     'SameSite=Strict',
     'Max-Age=0',
-  ];
-  if (process.env.NODE_ENV === 'production') {
-    parts.push('Secure');
-  }
-  return parts.join('; ');
+    'Secure',
+  ].join('; ');
 }
 
 function parseCookies(header) {

@@ -24,17 +24,18 @@ function parseCookies(header) {
 }
 
 function buildCookie(name, value, maxAge) {
-  const parts = [
+  // Always Secure: Vercel serves every deployment (production and preview)
+  // over HTTPS, and `localhost` is exempted from the Secure requirement by
+  // browsers, so there's no legitimate case where this cookie should ever
+  // be allowed over plain HTTP.
+  return [
     `${name}=${value}`,
     'Path=/',
     'HttpOnly',
     'SameSite=Strict',
     `Max-Age=${maxAge}`,
-  ];
-  if (process.env.NODE_ENV === 'production') {
-    parts.push('Secure');
-  }
-  return parts.join('; ');
+    'Secure',
+  ].join('; ');
 }
 
 function requireAdmin(req, res) {
@@ -44,6 +45,46 @@ function requireAdmin(req, res) {
     return false;
   }
   return true;
+}
+
+// Best-effort brute-force mitigation for the admin password. This state lives
+// in the function instance's memory, so it resets on cold start and isn't
+// shared across concurrent instances — it raises the bar against a naive
+// scripted attacker hitting a single warm instance, but is NOT a substitute
+// for a persistent-store-backed limiter (e.g. Vercel KV/Upstash) if this
+// needs to be robust against a distributed attempt.
+const loginAttempts = new Map(); // ip -> { count, firstAttemptAt }
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const LOGIN_MAX_ATTEMPTS = 5;
+
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return xff.split(',')[0].trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+function isLoginRateLimited(ip) {
+  const entry = loginAttempts.get(ip);
+  if (!entry) return false;
+  if (Date.now() - entry.firstAttemptAt > LOGIN_WINDOW_MS) {
+    loginAttempts.delete(ip);
+    return false;
+  }
+  return entry.count >= LOGIN_MAX_ATTEMPTS;
+}
+
+function recordFailedLogin(ip) {
+  const entry = loginAttempts.get(ip);
+  const now = Date.now();
+  if (!entry || now - entry.firstAttemptAt > LOGIN_WINDOW_MS) {
+    loginAttempts.set(ip, { count: 1, firstAttemptAt: now });
+  } else {
+    entry.count += 1;
+  }
+}
+
+function clearFailedLogins(ip) {
+  loginAttempts.delete(ip);
 }
 
 async function sendApprovalEmail(investorEmail, fileName) {
@@ -81,12 +122,20 @@ async function handleLogin(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const ip = getClientIp(req);
+
+  if (isLoginRateLimited(ip)) {
+    return res.status(429).json({ error: 'Too many attempts. Please try again later.' });
+  }
+
   const { password } = req.body || {};
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
+    recordFailedLogin(ip);
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
+  clearFailedLogins(ip);
   console.log('[admin-login] setting misan_admin cookie');
   res.setHeader('Set-Cookie', buildCookie('misan_admin', process.env.ADMIN_PASSWORD, 86400));
   return res.status(200).json({ success: true });
@@ -218,8 +267,13 @@ const ROUTES = {
 };
 
 module.exports = async (req, res) => {
-  const { action } = req.query;
-  const handler = ROUTES[action];
+  // Parse the route straight from the request path rather than trusting the
+  // shape of req.query.action — same fix applied to api/auth/[...action].js
+  // after req.query.action proved unreliable for this deployment's routing.
+  const pathname = (req.url || '').split('?')[0];
+  const match = pathname.match(/^\/api\/admin\/(.+)$/);
+  const action = match ? match[1] : null;
+  const handler = action ? ROUTES[action] : null;
 
   if (!handler) {
     return res.status(404).json({ error: 'Not found' });
