@@ -76,5 +76,41 @@
       });
     })();
   </script>
+  <script>
+    (function () {
+      // Handle Supabase invite/recovery/signup token in the URL hash
+      // (e.g. #access_token=xxx&refresh_token=yyy&type=invite) and exchange
+      // it for a misan_session cookie so the investor lands logged in.
+      var hash = window.location.hash;
+      if (!hash || hash.indexOf('access_token') === -1) return;
+
+      var params = new URLSearchParams(hash.substring(1));
+      var accessToken = params.get('access_token');
+      var refreshToken = params.get('refresh_token');
+      var type = params.get('type');
+
+      if (!accessToken || (type !== 'invite' && type !== 'recovery' && type !== 'signup')) return;
+
+      var m = document.getElementById('gateMsg');
+      if (m) m.textContent = 'Signing you in...';
+
+      fetch('/api/auth/exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ access_token: accessToken, refresh_token: refreshToken }),
+      })
+        .then(function (res) {
+          if (res.ok) {
+            window.location.href = '/investors/portal/';
+            return;
+          }
+          if (m) m.textContent = 'This invite link has expired. Please request a new one.';
+        })
+        .catch(function () {
+          if (m) m.textContent = 'This invite link has expired. Please request a new one.';
+        });
+    })();
+  </script>
 </body>
 </html>
