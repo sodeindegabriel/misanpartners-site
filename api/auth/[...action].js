@@ -240,8 +240,12 @@ const ROUTES = {
 };
 
 module.exports = async (req, res) => {
-  const raw = req.query.action;
-  const segments = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  // Parse the route straight from the request path rather than trusting the
+  // shape of req.query.action (string vs array vs slash-joined string varies
+  // by runtime/routing convention) — this works regardless of that detail.
+  const pathname = (req.url || '').split('?')[0];
+  const match = pathname.match(/^\/api\/auth\/(.+)$/);
+  const segments = match ? match[1].split('/').filter(Boolean) : [];
 
   if (segments.length === 2 && segments[0] === 'google' && segments[1] === 'callback') {
     return handleGoogleCallback(req, res);
