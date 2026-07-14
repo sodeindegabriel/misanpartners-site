@@ -496,7 +496,7 @@
       <div class="amb"></div>
       <main class="portal proj ${color}">
         <div class="wrap">
-          <a class="back" href="../../index.html">← All projects</a>
+          <a class="back" href="/investors/portal/">← All projects</a>
           <div class="proj-sub">${p.subsidiary}</div>
           <h1>${p.name}</h1>
           <p class="lede">${p.tagline}</p>
