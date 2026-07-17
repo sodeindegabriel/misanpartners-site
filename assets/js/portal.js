@@ -20,6 +20,35 @@
     { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
   ));
 
+  const MONTH_NAMES = {
+    jan:0, january:0, feb:1, february:1, mar:2, march:2, apr:3, april:3,
+    may:4, jun:5, june:5, jul:6, july:6, aug:7, august:7,
+    sep:8, sept:8, september:8, oct:9, october:9, nov:10, november:10, dec:11, december:11
+  };
+  const QUARTER_MONTHS = { '1': 0, '2': 3, '3': 6, '4': 9 };
+
+  function parseMilestoneDate(dateStr){
+    const s = String(dateStr || '').trim();
+
+    const qMatch = s.match(/^Q([1-4])\s+(\d{4})$/i);
+    if (qMatch) return new Date(parseInt(qMatch[2], 10), QUARTER_MONTHS[qMatch[1]], 1);
+
+    const yMatch = s.match(/^(\d{4})$/);
+    if (yMatch) return new Date(parseInt(yMatch[1], 10), 0, 1);
+
+    const myMatch = s.match(/^([A-Za-z]+)\s+(\d{4})$/);
+    if (myMatch){
+      const month = MONTH_NAMES[myMatch[1].toLowerCase()];
+      if (month != null) return new Date(parseInt(myMatch[2], 10), month, 1);
+    }
+
+    const fallback = new Date(s);
+    return isNaN(fallback.getTime()) ? new Date(0) : fallback;
+  }
+
+  const sortMilestonesByDate = milestones =>
+    milestones.slice().sort((a, b) => parseMilestoneDate(a.date) - parseMilestoneDate(b.date));
+
   function extractFolderId(driveUrl){
     if (!driveUrl) return null;
     const m = driveUrl.match(/\/folders\/([^/?#]+)/);
@@ -398,7 +427,7 @@
     const stats = (p.headline_stats || []).map(s =>
       `<div><div class="l">${s.label}</div><div class="v">${s.value}</div></div>`).join('');
 
-    const milestones = (p.milestones || []).map(m => {
+    const milestones = sortMilestonesByDate(p.milestones || []).map(m => {
       const cls = `mile ${m.status}` + (color==='cyan' && m.status==='in_progress' ? ' cyan' : '');
       const progressBar = m.progress_pct ? `
         <div class="progress"><div class="fill" style="width:${m.progress_pct}%"></div></div>
