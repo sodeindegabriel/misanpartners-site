@@ -12,6 +12,12 @@
   <title>Set Password &mdash; Misan Partners</title>
   <meta name="description" content="Misan Partners investor access.">
   <meta name="robots" content="noindex">
+  <style>
+    .pw-wrap{position:relative}
+    .pw-wrap input{padding-right:52px}
+    .pw-toggle{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:none;border:none;padding:4px 2px;color:rgba(255,255,255,.45);font-size:12px;letter-spacing:.02em;cursor:pointer;font-family:inherit}
+    .pw-toggle:hover{color:rgba(255,255,255,.75)}
+  </style>
 </head>
 <body>
   <div class="amb"></div>
@@ -28,17 +34,37 @@
         <p class="micro" style="margin:0 0 4px;text-align:left">Set your password</p>
         <label class="field">
           <span class="flabel">Password</span>
-          <input type="password" id="setupPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+          <div class="pw-wrap">
+            <input type="password" id="setupPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+            <button type="button" class="pw-toggle" data-target="setupPassword">Show</button>
+          </div>
         </label>
         <label class="field">
           <span class="flabel">Confirm password</span>
-          <input type="password" id="setupConfirmPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+          <div class="pw-wrap">
+            <input type="password" id="setupConfirmPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+            <button type="button" class="pw-toggle" data-target="setupConfirmPassword">Show</button>
+          </div>
         </label>
         <button type="submit" class="enter">Set Password &amp; Enter Portal</button>
       </form>
       <p class="gate-msg" id="setupMsg" role="status" aria-live="polite"></p>
     </div>
   </main>
+  <script>
+    (function () {
+      var toggles = document.querySelectorAll('.pw-toggle');
+      for (var i = 0; i < toggles.length; i++) {
+        toggles[i].addEventListener('click', function () {
+          var input = document.getElementById(this.getAttribute('data-target'));
+          if (!input) return;
+          var isHidden = input.type === 'password';
+          input.type = isHidden ? 'text' : 'password';
+          this.textContent = isHidden ? 'Hide' : 'Show';
+        });
+      }
+    })();
+  </script>
   <script>
     (function () {
       var formEl = document.getElementById('setupForm');
