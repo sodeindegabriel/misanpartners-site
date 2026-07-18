@@ -33,7 +33,7 @@ CAA ICON | Strategic Consulting
 Alaro City / Rendeavour | Site Partner
 
 ## Milestones
-[complete] Oct 2024 | Site secured · 9.25 ha, Alaro City
+[complete] Oct 2025 | Site secured · 9.25 ha, Alaro City
 [complete] Jan 2026 | Kéré Architecture engaged
 [complete] Feb 2026 | CAA ICON engaged
 [complete] Jan 2026 | Kéré & CAA ICON inaugural site visit
@@ -43,7 +43,7 @@ Alaro City / Rendeavour | Site Partner
 [complete] Jan 2026 | Seed close complete · $250k
 [complete] Apr 2026 | $550k total committed
 [complete] Mar 2026 | Geotechnical, topographical & traffic studies
-[complete] May 2026 | Preliminary EIA report complete
+[complete] Feb 2026 | Preliminary EIA report complete
 [in progress] May 2026 | Kéré RIBA Stage 1 · internal review | 25% | Week 2 of 8-week review before authorising Stage 2.
 [in progress] Q2 2026 | Audience Study · fieldwork
 [in progress] Q2 2026 | Lekki Corridor Market Study
