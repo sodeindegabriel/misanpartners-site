@@ -76,7 +76,29 @@
     .pw-wrap input{padding-right:52px}
     .pw-toggle{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:none;border:none;padding:4px 2px;color:rgba(255,255,255,.45);font-size:12px;letter-spacing:.02em;cursor:pointer;font-family:inherit}
     .pw-toggle:hover{color:rgba(255,255,255,.75)}
-    .security-card{max-width:380px;background:var(--card);border:1px solid var(--w10);border-radius:20px;padding:32px 28px;margin-bottom:48px}
+    .account-menu{position:relative}
+    .account-btn{background:none;border:1px solid var(--w10);border-radius:8px;padding:8px 14px;
+      color:var(--w55);font-family:inherit;font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+      cursor:pointer;transition:color .2s,border-color .2s;display:flex;align-items:center;gap:6px}
+    .account-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+    .account-btn .caret{font-size:9px}
+    .account-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#0a0a0a;
+      border:1px solid var(--w10);border-radius:10px;overflow:hidden;min-width:170px;
+      box-shadow:0 8px 24px rgba(0,0,0,.45);z-index:20}
+    .account-dropdown-item{display:block;width:100%;text-align:left;background:none;border:none;
+      color:rgba(255,255,255,.85);font-family:inherit;font-size:12px;letter-spacing:.03em;
+      padding:12px 16px;cursor:pointer;transition:background .2s}
+    .account-dropdown-item:hover{background:rgba(255,255,255,.08)}
+    .account-dropdown-item + .account-dropdown-item{border-top:1px solid var(--w10)}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;
+      justify-content:center;padding:20px;z-index:100}
+    .modal-card{width:100%;max-width:380px;background:#0a0a0a;border:1px solid rgba(255,255,255,.12);
+      border-radius:20px;padding:32px 28px}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    .modal-head h2{font-size:16px;font-weight:300}
+    .modal-close{background:none;border:none;color:rgba(255,255,255,.5);font-size:20px;line-height:1;
+      cursor:pointer;padding:4px 6px;transition:color .2s}
+    .modal-close:hover{color:#fff}
   </style>
 </head>
 <body>
@@ -108,7 +130,13 @@
     <div class="admin-wrap">
       <div class="admin-head">
         <h1>Investors</h1>
-        <a href="#" id="signOutBtn" class="signout">Sign out</a>
+        <div class="account-menu">
+          <button type="button" id="accountBtn" class="account-btn" aria-haspopup="true" aria-expanded="false">Account <span class="caret">&#9662;</span></button>
+          <div class="account-dropdown" id="accountDropdown" style="display:none">
+            <button type="button" id="changePasswordMenuItem" class="account-dropdown-item">Change Password</button>
+            <button type="button" id="signOutBtn" class="account-dropdown-item">Sign out</button>
+          </div>
+        </div>
       </div>
       <form id="inviteForm" class="invite-form">
         <input type="email" id="inviteEmail" required placeholder="investor@email.com" autocomplete="off">
@@ -133,39 +161,42 @@
         <div class="admin-count" id="resultsCount">0 requests</div>
       </div>
       <div class="table-scroll" id="tableHost"></div>
-
-      <div class="admin-head">
-        <h1>Security</h1>
-      </div>
-      <div class="security-card">
-        <form class="gate-form" id="changePasswordForm" autocomplete="off" novalidate>
-          <label class="field">
-            <span class="flabel">Current password</span>
-            <div class="pw-wrap">
-              <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="••••••••">
-              <button type="button" class="pw-toggle" data-target="currentPassword">Show</button>
-            </div>
-          </label>
-          <label class="field">
-            <span class="flabel">New password</span>
-            <div class="pw-wrap">
-              <input type="password" id="newPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
-              <button type="button" class="pw-toggle" data-target="newPassword">Show</button>
-            </div>
-          </label>
-          <label class="field">
-            <span class="flabel">Confirm new password</span>
-            <div class="pw-wrap">
-              <input type="password" id="confirmNewPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
-              <button type="button" class="pw-toggle" data-target="confirmNewPassword">Show</button>
-            </div>
-          </label>
-          <button type="submit" class="enter">Update Password</button>
-        </form>
-        <p class="gate-msg" id="changePasswordMsg" role="status" aria-live="polite"></p>
-      </div>
     </div>
   </main>
+
+  <div class="modal-overlay" id="changePasswordOverlay" style="display:none">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Change Password</h2>
+        <button type="button" class="modal-close" id="closeChangePasswordBtn" aria-label="Close">&times;</button>
+      </div>
+      <form class="gate-form" id="changePasswordForm" autocomplete="off" novalidate>
+        <label class="field">
+          <span class="flabel">Current password</span>
+          <div class="pw-wrap">
+            <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="pw-toggle" data-target="currentPassword">Show</button>
+          </div>
+        </label>
+        <label class="field">
+          <span class="flabel">New password</span>
+          <div class="pw-wrap">
+            <input type="password" id="newPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+            <button type="button" class="pw-toggle" data-target="newPassword">Show</button>
+          </div>
+        </label>
+        <label class="field">
+          <span class="flabel">Confirm new password</span>
+          <div class="pw-wrap">
+            <input type="password" id="confirmNewPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+            <button type="button" class="pw-toggle" data-target="confirmNewPassword">Show</button>
+          </div>
+        </label>
+        <button type="submit" class="enter">Update Password</button>
+      </form>
+      <p class="gate-msg" id="changePasswordMsg" role="status" aria-live="polite"></p>
+    </div>
+  </div>
 
   <script>
     (function(){
@@ -186,6 +217,11 @@
       var changePasswordForm = document.getElementById('changePasswordForm');
       var changePasswordMsg = document.getElementById('changePasswordMsg');
       var signOutBtn = document.getElementById('signOutBtn');
+      var accountBtn = document.getElementById('accountBtn');
+      var accountDropdown = document.getElementById('accountDropdown');
+      var changePasswordMenuItem = document.getElementById('changePasswordMenuItem');
+      var changePasswordOverlay = document.getElementById('changePasswordOverlay');
+      var closeChangePasswordBtn = document.getElementById('closeChangePasswordBtn');
       var refreshTimer = null;
       var allRows = [];
 
@@ -199,6 +235,59 @@
           this.textContent = isHidden ? 'Hide' : 'Show';
         });
       }
+
+      function closeAccountDropdown(){
+        accountDropdown.style.display = 'none';
+        accountBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleAccountDropdown(){
+        var isOpen = accountDropdown.style.display !== 'none';
+        if (isOpen) {
+          closeAccountDropdown();
+        } else {
+          accountDropdown.style.display = '';
+          accountBtn.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      function openChangePasswordModal(){
+        changePasswordMsg.textContent = '';
+        changePasswordOverlay.style.display = 'flex';
+        document.getElementById('currentPassword').focus();
+      }
+
+      function closeChangePasswordModal(){
+        changePasswordOverlay.style.display = 'none';
+      }
+
+      accountBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleAccountDropdown();
+      });
+
+      document.addEventListener('click', function(e){
+        if (!accountDropdown.contains(e.target) && e.target !== accountBtn) {
+          closeAccountDropdown();
+        }
+      });
+
+      changePasswordMenuItem.addEventListener('click', function(){
+        closeAccountDropdown();
+        openChangePasswordModal();
+      });
+
+      closeChangePasswordBtn.addEventListener('click', closeChangePasswordModal);
+
+      changePasswordOverlay.addEventListener('click', function(e){
+        if (e.target === changePasswordOverlay) closeChangePasswordModal();
+      });
+
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && changePasswordOverlay.style.display !== 'none') {
+          closeChangePasswordModal();
+        }
+      });
 
       function escapeHTML(s){
         return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
