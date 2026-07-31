@@ -86,7 +86,10 @@
       <span class="orb mini"></span>
       <div style="font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:28px">Misan Admin</div>
       <form class="gate-form" id="adminForm" autocomplete="off" novalidate>
-        <input type="email" id="adminEmail" value="c@misanpartners.com" autocomplete="username" style="display:none">
+        <label class="field">
+          <span class="flabel">Username</span>
+          <input type="email" id="adminEmail" value="c@misanpartners.com" autocomplete="username" placeholder="c@misanpartners.com">
+        </label>
         <label class="field">
           <span class="flabel">Password</span>
           <div class="pw-wrap">
@@ -455,6 +458,7 @@
 
       form.addEventListener('submit', function(e){
         e.preventDefault();
+        var email = document.getElementById('adminEmail').value; // not sent — backend auth is password-only
         var password = document.getElementById('adminPassword').value;
         var btn = form.querySelector('.enter');
         var original = btn.textContent;
