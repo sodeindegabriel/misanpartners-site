@@ -73,6 +73,17 @@ function buildCookie(name, value, maxAge) {
   ].join('; ');
 }
 
+function clearCookie(name) {
+  return [
+    `${name}=`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Strict',
+    'Max-Age=0',
+    'Secure',
+  ].join('; ');
+}
+
 async function requireAdmin(req, res) {
   const cookies = parseCookies(req.headers.cookie);
   if (!cookies.misan_admin || !(await verifyAdminPassword(cookies.misan_admin))) {
@@ -326,6 +337,12 @@ async function handleChangePassword(req, res) {
   return res.status(200).json({ success: true });
 }
 
+async function handleLogout(req, res) {
+  res.setHeader('Set-Cookie', clearCookie('misan_admin'));
+  res.writeHead(302, { Location: '/admin/' });
+  return res.end();
+}
+
 const ROUTES = {
   login: handleLogin,
   requests: handleRequests,
@@ -335,6 +352,9 @@ const ROUTES = {
   revoke: handleRevoke,
   changepassword: handleChangePassword,
 };
+// Marked public so a corrupted/expired misan_admin cookie can never block
+// the user from clearing it — no requireAdmin() gate on this route.
+ROUTES.logout = { fn: handleLogout, public: true };
 
 module.exports = async (req, res) => {
   // Parse the route straight from the request path rather than trusting the
@@ -343,7 +363,8 @@ module.exports = async (req, res) => {
   const pathname = (req.url || '').split('?')[0];
   const match = pathname.match(/^\/api\/admin\/(.+)$/);
   const action = match ? match[1] : null;
-  const handler = action ? ROUTES[action] : null;
+  const route = action ? ROUTES[action] : null;
+  const handler = typeof route === 'function' ? route : route && route.fn;
 
   if (!handler) {
     return res.status(404).json({ error: 'Not found' });

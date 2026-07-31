@@ -108,6 +108,7 @@
     <div class="admin-wrap">
       <div class="admin-head">
         <h1>Investors</h1>
+        <a href="#" id="signOutBtn" class="signout">Sign out</a>
       </div>
       <form id="inviteForm" class="invite-form">
         <input type="email" id="inviteEmail" required placeholder="investor@email.com" autocomplete="off">
@@ -184,6 +185,7 @@
       var inviteMsg = document.getElementById('inviteMsg');
       var changePasswordForm = document.getElementById('changePasswordForm');
       var changePasswordMsg = document.getElementById('changePasswordMsg');
+      var signOutBtn = document.getElementById('signOutBtn');
       var refreshTimer = null;
       var allRows = [];
 
@@ -609,6 +611,12 @@
             btn.disabled = false;
             changePasswordMsg.textContent = 'Could not update password.';
           });
+      });
+
+      signOutBtn.addEventListener('click', async function(e){
+        e.preventDefault();
+        await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+        window.location.href = '/admin/';
       });
 
       searchInput.addEventListener('input', applyFilters);
