@@ -17,6 +17,7 @@
     .pw-wrap input{padding-right:52px}
     .pw-toggle{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:none;border:none;padding:4px 2px;color:rgba(255,255,255,.45);font-size:12px;letter-spacing:.02em;cursor:pointer;font-family:inherit}
     .pw-toggle:hover{color:rgba(255,255,255,.75)}
+    .field-hint{display:block;margin-top:6px;font-size:11px;color:rgba(255,255,255,.4)}
   </style>
 </head>
 <body>
@@ -38,6 +39,7 @@
             <input type="password" id="setupPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
             <button type="button" class="pw-toggle" data-target="setupPassword">Show</button>
           </div>
+          <span class="field-hint">Minimum 8 characters</span>
         </label>
         <label class="field">
           <span class="flabel">Confirm your password</span>
