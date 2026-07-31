@@ -6,6 +6,7 @@
     "md-to-json": "node scripts/md-to-json.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "^2.45.0",
+    "bcryptjs": "^2.4.3"
   }
 }

@@ -76,6 +76,7 @@
     .pw-wrap input{padding-right:52px}
     .pw-toggle{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:none;border:none;padding:4px 2px;color:rgba(255,255,255,.45);font-size:12px;letter-spacing:.02em;cursor:pointer;font-family:inherit}
     .pw-toggle:hover{color:rgba(255,255,255,.75)}
+    .security-card{max-width:380px;background:var(--card);border:1px solid var(--w10);border-radius:20px;padding:32px 28px;margin-bottom:48px}
   </style>
 </head>
 <body>
@@ -131,6 +132,37 @@
         <div class="admin-count" id="resultsCount">0 requests</div>
       </div>
       <div class="table-scroll" id="tableHost"></div>
+
+      <div class="admin-head">
+        <h1>Security</h1>
+      </div>
+      <div class="security-card">
+        <form class="gate-form" id="changePasswordForm" autocomplete="off" novalidate>
+          <label class="field">
+            <span class="flabel">Current password</span>
+            <div class="pw-wrap">
+              <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="••••••••">
+              <button type="button" class="pw-toggle" data-target="currentPassword">Show</button>
+            </div>
+          </label>
+          <label class="field">
+            <span class="flabel">New password</span>
+            <div class="pw-wrap">
+              <input type="password" id="newPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+              <button type="button" class="pw-toggle" data-target="newPassword">Show</button>
+            </div>
+          </label>
+          <label class="field">
+            <span class="flabel">Confirm new password</span>
+            <div class="pw-wrap">
+              <input type="password" id="confirmNewPassword" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+              <button type="button" class="pw-toggle" data-target="confirmNewPassword">Show</button>
+            </div>
+          </label>
+          <button type="submit" class="enter">Update Password</button>
+        </form>
+        <p class="gate-msg" id="changePasswordMsg" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </main>
 
@@ -150,6 +182,8 @@
       var inviteForm = document.getElementById('inviteForm');
       var inviteEmail = document.getElementById('inviteEmail');
       var inviteMsg = document.getElementById('inviteMsg');
+      var changePasswordForm = document.getElementById('changePasswordForm');
+      var changePasswordMsg = document.getElementById('changePasswordMsg');
       var refreshTimer = null;
       var allRows = [];
 
@@ -526,6 +560,54 @@
           .finally(function(){
             btn.textContent = original;
             btn.disabled = false;
+          });
+      });
+
+      changePasswordForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var currentPassword = document.getElementById('currentPassword').value;
+        var newPassword = document.getElementById('newPassword').value;
+        var confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        changePasswordMsg.textContent = '';
+
+        if (newPassword.length < 8) {
+          changePasswordMsg.textContent = 'New password must be at least 8 characters.';
+          return;
+        }
+        if (newPassword !== confirmNewPassword) {
+          changePasswordMsg.textContent = 'New passwords do not match.';
+          return;
+        }
+
+        var btn = changePasswordForm.querySelector('.enter');
+        var original = btn.textContent;
+        btn.textContent = 'Updating...';
+        btn.disabled = true;
+
+        fetch('/api/admin/changepassword', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
+        })
+          .then(function(res){
+            return res.json().catch(function(){ return {}; }).then(function(data){
+              if (res.ok){
+                changePasswordForm.reset();
+                changePasswordMsg.textContent = 'Password updated. Please log in again.';
+                setTimeout(function(){ window.location.href = '/admin/'; }, 2000);
+                return;
+              }
+              btn.textContent = original;
+              btn.disabled = false;
+              changePasswordMsg.textContent = (data && data.error) || 'Could not update password.';
+            });
+          })
+          .catch(function(){
+            btn.textContent = original;
+            btn.disabled = false;
+            changePasswordMsg.textContent = 'Could not update password.';
           });
       });
 

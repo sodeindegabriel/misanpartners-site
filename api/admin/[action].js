@@ -7,8 +7,43 @@
  * count limit — the logic below is unchanged from the original per-route files.
  */
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+const BCRYPT_HASH_RE = /^\$2[aby]\$\d{2}\$/;
+
+async function getAdminPasswordHash() {
+  try {
+    const { data, error } = await supabase
+      .from('admin_settings')
+      .select('value')
+      .eq('key', 'admin_password')
+      .single();
+    if (error || !data) return null;
+    return data.value;
+  } catch (err) {
+    console.log('[admin] Failed to read admin_settings from Supabase:', err.message);
+    return null;
+  }
+}
+
+// Verifies a candidate password against the Supabase-stored bcrypt hash. If
+// Supabase is unavailable, or the stored value isn't a real bcrypt hash yet
+// (e.g. the migration's placeholder row), falls back to the Vercel
+// ADMIN_PASSWORD env var so login keeps working through the migration.
+async function verifyAdminPassword(password) {
+  if (!password) return false;
+  const stored = await getAdminPasswordHash();
+  if (stored && BCRYPT_HASH_RE.test(stored)) {
+    try {
+      return await bcrypt.compare(password, stored);
+    } catch (err) {
+      return false;
+    }
+  }
+  return Boolean(process.env.ADMIN_PASSWORD) && password === process.env.ADMIN_PASSWORD;
+}
 
 function parseCookies(header) {
   const cookies = {};
@@ -38,9 +73,9 @@ function buildCookie(name, value, maxAge) {
   ].join('; ');
 }
 
-function requireAdmin(req, res) {
+async function requireAdmin(req, res) {
   const cookies = parseCookies(req.headers.cookie);
-  if (!cookies.misan_admin || cookies.misan_admin !== process.env.ADMIN_PASSWORD) {
+  if (!cookies.misan_admin || !(await verifyAdminPassword(cookies.misan_admin))) {
     res.status(401).json({ error: 'Invalid credentials' });
     return false;
   }
@@ -130,19 +165,19 @@ async function handleLogin(req, res) {
 
   const { password } = req.body || {};
 
-  if (!password || password !== process.env.ADMIN_PASSWORD) {
+  if (!password || !(await verifyAdminPassword(password))) {
     recordFailedLogin(ip);
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
   clearFailedLogins(ip);
   console.log('[admin-login] setting misan_admin cookie');
-  res.setHeader('Set-Cookie', buildCookie('misan_admin', process.env.ADMIN_PASSWORD, 86400));
+  res.setHeader('Set-Cookie', buildCookie('misan_admin', password, 86400));
   return res.status(200).json({ success: true });
 }
 
 async function handleRequests(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const { data, error } = await supabase
     .from('access_requests')
@@ -161,7 +196,7 @@ async function handleApprove(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const { requestId, action } = req.body || {};
   const validActions = ['approved', 'declined', 'revoked'];
@@ -193,7 +228,7 @@ async function handleInvestors(req, res) {
   console.log('[admin-investors] cookie header:', cookieHeader ? 'present' : 'missing');
   console.log('[admin-investors] cookies:', cookieHeader.split(';').map((c) => c.trim().split('=')[0]));
 
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const { data, error } = await supabase.auth.admin.listUsers();
 
@@ -216,7 +251,7 @@ async function handleInvite(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const { email } = req.body || {};
 
@@ -240,7 +275,7 @@ async function handleRevoke(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const { userId } = req.body || {};
 
@@ -257,6 +292,40 @@ async function handleRevoke(req, res) {
   return res.status(200).json({ success: true });
 }
 
+async function handleChangePassword(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  if (!(await requireAdmin(req, res))) return;
+
+  const { currentPassword, newPassword } = req.body || {};
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Missing current or new password' });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'New password must be at least 8 characters' });
+  }
+  if (!(await verifyAdminPassword(currentPassword))) {
+    return res.status(401).json({ error: 'Current password is incorrect' });
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 10);
+
+  const { error } = await supabase
+    .from('admin_settings')
+    .upsert({ key: 'admin_password', value: newHash, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+
+  if (error) {
+    return res.status(500).json({ error: 'Failed to update password' });
+  }
+
+  // Force re-login with the new password.
+  res.setHeader('Set-Cookie', buildCookie('misan_admin', '', 0));
+  return res.status(200).json({ success: true });
+}
+
 const ROUTES = {
   login: handleLogin,
   requests: handleRequests,
@@ -264,6 +333,7 @@ const ROUTES = {
   investors: handleInvestors,
   invite: handleInvite,
   revoke: handleRevoke,
+  changepassword: handleChangePassword,
 };
 
 module.exports = async (req, res) => {
