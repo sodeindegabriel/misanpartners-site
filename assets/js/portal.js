@@ -123,7 +123,11 @@
     const list = ['axd', 'galatians'];
     const out = [];
     for (const id of list){
-      try { out.push(await fetchJSON(id)); }
+      try {
+        const project = await fetchJSON(id);
+        if (project && project.hidden === true) continue;
+        out.push(project);
+      }
       catch(e){ console.error('Project load failed:', id, e); }
     }
     return out;
@@ -412,7 +416,7 @@
           <section class="welcome">
             <div class="kicker">Welcome back</div>
             <h1>Your projects</h1>
-            <p class="lede">Two active investments. Latest progress and documents below.</p>
+            <p class="lede">${projects.length} active investment${projects.length === 1 ? '' : 's'}. Latest progress and documents below.</p>
           </section>
           <section class="cards">${cards}</section>
         </div>
