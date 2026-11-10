@@ -90,13 +90,49 @@
   "milestones": [
     {
       "id": "m1",
+      "title": "Alaro LOI secured",
+      "date": "Oct 2024",
+      "status": "complete"
+    },
+    {
+      "id": "m2",
+      "title": "Outline budget complete",
+      "date": "Mar 2025",
+      "status": "complete"
+    },
+    {
+      "id": "m3",
+      "title": "LOI from lead architect · Kéré",
+      "date": "Apr 2025",
+      "status": "complete"
+    },
+    {
+      "id": "m1",
       "title": "Site secured · 9.25 ha, Alaro City",
       "date": "Oct 2025",
       "status": "complete"
     },
     {
+      "id": "m8",
+      "title": "Seed close complete · $250k",
+      "date": "Jan 2026",
+      "status": "complete"
+    },
+    {
       "id": "m2",
       "title": "Kéré Architecture engaged",
+      "date": "Jan 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m4",
+      "title": "Kéré & CAA ICON inaugural site visit",
+      "date": "Jan 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m8",
+      "title": "EIA application filed",
       "date": "Jan 2026",
       "status": "complete"
     },
@@ -107,9 +143,15 @@
       "status": "complete"
     },
     {
-      "id": "m4",
-      "title": "Kéré & CAA ICON inaugural site visit",
-      "date": "Jan 2026",
+      "id": "m10",
+      "title": "Topographical survey complete",
+      "date": "Feb 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m11",
+      "title": "Geotechnical investigation and traffic study complete",
+      "date": "Mar 2026",
       "status": "complete"
     },
     {
@@ -131,77 +173,117 @@
       "status": "complete"
     },
     {
-      "id": "m8",
-      "title": "Seed close complete · $250k",
-      "date": "Jan 2026",
-      "status": "complete"
-    },
-    {
       "id": "m9",
       "title": "$550k total committed",
       "date": "Apr 2026",
       "status": "complete"
     },
     {
-      "id": "m10",
-      "title": "Geotechnical, topographical & traffic studies",
-      "date": "Mar 2026",
-      "status": "complete"
-    },
-    {
-      "id": "m11",
-      "title": "Preliminary EIA report complete",
-      "date": "Feb 2026",
-      "status": "complete"
-    },
-    {
-      "id": "m12",
-      "title": "Kéré RIBA Stage 1 · internal review",
-      "date": "May 2026",
-      "status": "in_progress",
-      "progress_pct": 25,
-      "note": "Week 2 of 8-week review before authorising Stage 2."
-    },
-    {
-      "id": "m13",
-      "title": "Audience Study · fieldwork",
-      "date": "Q2 2026",
-      "status": "in_progress"
-    },
-    {
-      "id": "m14",
-      "title": "Lekki Corridor Market Study",
-      "date": "Q2 2026",
-      "status": "in_progress"
-    },
-    {
-      "id": "m15",
-      "title": "Full Environmental Impact Assessment",
-      "date": "Q3 2026",
-      "status": "in_progress"
-    },
-    {
       "id": "m16",
-      "title": "Quantity Surveyor engagement",
-      "date": "Q2 2026",
-      "status": "upcoming"
+      "title": "Preliminary Concept Design complete · Kéré RIBA Stage 1",
+      "date": "May 2026",
+      "status": "complete"
     },
     {
       "id": "m17",
-      "title": "RIBA Stage 2 · Concept Design",
-      "date": "Q3 2026",
-      "status": "upcoming"
+      "title": "Preliminary EIA report complete",
+      "date": "Aug 2026",
+      "status": "complete"
     },
     {
       "id": "m18",
-      "title": "Phase 1 close · $3M",
-      "date": "Q4 2026",
-      "status": "upcoming"
+      "title": "Lekki Corridor Market Study complete",
+      "date": "Sep 2026",
+      "status": "complete"
     },
     {
       "id": "m19",
-      "title": "Development Approval · Alaro",
-      "date": "Q3 2027",
+      "title": "Preliminary Cost Estimate complete · 19.5 ha masterplan",
+      "date": "Sep 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m20",
+      "title": "Audience Study complete · Phase 2",
+      "date": "Oct 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m21",
+      "title": "Review & Updated Feasibility complete",
+      "date": "Oct 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m22",
+      "title": "Financial Model complete for this stage",
+      "date": "Oct 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m23",
+      "title": "Quantity Surveyor appointed",
+      "date": "Oct 2026",
+      "status": "complete"
+    },
+    {
+      "id": "m24",
+      "title": "3-month extension of the land reservation",
+      "date": "Nov 2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "m25",
+      "title": "Alaro formal approval · boundary extension to 19.5 ha",
+      "date": "Dec 2026",
+      "status": "in_progress"
+    },
+    {
+      "id": "m26",
+      "title": "Environmental Impact Assessment",
+      "date": "Oct 2027",
+      "status": "in_progress"
+    },
+    {
+      "id": "m27",
+      "title": "Phase 1 close · $3M",
+      "date": "Dec 2026",
+      "status": "upcoming"
+    },
+    {
+      "id": "m28",
+      "title": "RIBA Stage 2 · Concept Design begins",
+      "date": "Apr 2027",
+      "status": "upcoming"
+    },
+    {
+      "id": "m29",
+      "title": "Agree indicative land value with Alaro",
+      "date": "Nov 2027",
+      "status": "upcoming"
+    },
+    {
+      "id": "m30",
+      "title": "Test business plan",
+      "date": "Nov 2027",
+      "status": "upcoming"
+    },
+    {
+      "id": "m31",
+      "title": "Development approval · Alaro",
+      "date": "Feb 2028",
+      "status": "upcoming"
+    },
+    {
+      "id": "m32",
+      "title": "Detailed Design",
+      "date": "Mar 2028",
+      "status": "upcoming"
+    },
+    {
+      "id": "m33",
+      "title": "Definitive Cost Estimate",
+      "date": "Apr 2028",
       "status": "upcoming"
     }
   ],
@@ -220,6 +302,13 @@
     }
   ],
   "updates": [
+    {
+      "id": "u-october-2026",
+      "date": "October 2026",
+      "title": "October 2026 investor update",
+      "summary": "Lekki Corridor Market Study, Audience Study Phase 2 and the Review & Updated Feasibility are complete. Quantity Surveyor appointed and the Preliminary Cost Estimate issued against the 19.5 ha masterplan. Financial Model complete for this stage and Preliminary EIA report complete. Fundraising continuing to convert, with the $3M pipeline targeted to close by December. Kéré Stage 2 (Concept Design) now scheduled to begin in Q2 2027.",
+      "document_id": null
+    },
     {
       "id": "u-2026-05",
       "date": "May 2026",
